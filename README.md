@@ -65,4 +65,6 @@ Open `http://localhost:5173`. Register or log in; the JWT is stored in **`localS
 
 ## Prisma schema
 
-`backend/prisma/schema.prisma` is the source of truth. `DATABASE_URL` is configured via `backend/.env` and `backend/prisma.config.ts` (Prisma 7).
+`backend/prisma/schema.prisma` is the source of truth. `DATABASE_URL` for **CLI** (migrate, generate) comes from `backend/.env` and `backend/prisma.config.ts` (Prisma 7).
+
+At **runtime**, Prisma 7 expects a driver adapter when the datasource URL is not embedded in the generated client. This project uses `@prisma/adapter-pg` with the connection string from `DATABASE_URL` in `PrismaService` (see `backend/src/prisma/prisma.service.ts`).
