@@ -9,11 +9,39 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  passwordHash String   @map("password_hash")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id           String        @id @default(uuid())
+  email        String        @unique
+  passwordHash String        @map("password_hash")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  transactions Transaction[]
 
   @@map("users")
+}
+
+enum Category {
+  FOOD
+  TRANSPORT
+  HOUSING
+  ENTERTAINMENT
+  HEALTH
+  SHOPPING
+  EDUCATION
+  UTILITIES
+  OTHER
+}
+
+model Transaction {
+  id        String   @id @default(uuid())
+  name      String
+  amount    Decimal  @db.Decimal(10, 2)
+  category  Category
+  date      DateTime
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
 }

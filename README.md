@@ -33,6 +33,14 @@ npm run start:dev
 - API base URL: `http://localhost:3000/api`
 - Health: `GET http://localhost:3000/api/health`
 - Auth: `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me` (Bearer JWT)
+- Transactions: `POST /api/transactions` (create), `GET /api/transactions` (list) — requires Bearer JWT
+
+### Authentication
+
+All transaction endpoints require a Bearer token:
+```bash
+curl -H "Authorization: Bearer <token>" http://localhost:3000/api/transactions
+```
 
 ## 3. Frontend
 

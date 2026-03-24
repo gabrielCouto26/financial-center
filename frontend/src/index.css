@@ -91,3 +91,86 @@ a {
   font-size: 0.875rem;
   color: #555;
 }
+
+/* Dashboard Layout */
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: #fff;
+  border-bottom: 1px solid #e5e5e5;
+  margin: -1.5rem -1.25rem 1.5rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+}
+
+.sidebar {
+  background: #fff;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+  height: fit-content;
+}
+
+.sidebar h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+.main-content {
+  background: #fff;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+}
+
+/* Transaction Table */
+.transaction-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.transaction-table th,
+.transaction-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.transaction-table th {
+  font-weight: 600;
+  background: #f9f9f9;
+}
+
+.transaction-table .amount {
+  text-align: right;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+/* Form Enhancements */
+.form select {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+}
+
+@media (max-width: 768px) {
+  .dashboard-content {
+    grid-template-columns: 1fr;
+  }
+}

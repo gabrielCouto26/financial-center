@@ -1,6 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { clearStoredToken } from '../../services/api';
+import { TransactionForm } from '../transactions/TransactionForm';
+import { TransactionList } from '../transactions/TransactionList';
 import type { SafeUser } from '../../types/user';
 
 type Props = {
@@ -26,17 +28,25 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
   if (hasToken && user) {
     return (
       <section>
-        <h1>Welcome</h1>
-        <p>
-          Signed in as <strong>{user.email}</strong>
-        </p>
-        <p className="hint">
-          Session is stored in <code>localStorage</code> (JWT). Reload the page
-          to verify persistence.
-        </p>
-        <button type="button" onClick={logout}>
-          Log out
-        </button>
+        <header className="dashboard-header">
+          <h1>Dashboard</h1>
+          <div className="user-info">
+            <span>Signed in as <strong>{user.email}</strong></span>
+            <button type="button" onClick={logout}>
+              Log out
+            </button>
+          </div>
+        </header>
+
+        <div className="dashboard-content">
+          <aside className="sidebar">
+            <TransactionForm />
+          </aside>
+
+          <main className="main-content">
+            <TransactionList />
+          </main>
+        </div>
       </section>
     );
   }
@@ -45,7 +55,7 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
     <section>
       <h1>Centro Financeiro Social</h1>
       <p>
-        Epic 1 foundation: create an account or log in to verify authentication.
+        Epic 2 foundation: create an account or log in to manage your personal expenses.
       </p>
       <p>
         <Link to="/login">Login</Link> · <Link to="/register">Register</Link>
