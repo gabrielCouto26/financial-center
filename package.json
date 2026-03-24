@@ -1,0 +1,41 @@
+{
+  "name": "financial-center",
+  "version": "1.0.0",
+  "description": "Monorepo layout: `backend/` (NestJS + Prisma + PostgreSQL), `frontend/` (Vite + React + TypeScript).",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "npm run test:backend && npm run typecheck:frontend",
+    "prepare": "husky",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:frontend": "cd frontend && npm run lint",
+    "typecheck:frontend": "cd frontend && npm run typecheck",
+    "test:backend": "cd backend && npm run test"
+  },
+  "lint-staged": {
+    "backend/src/**/*.ts": [
+      "npx eslint --fix --config backend/eslint.config.mjs",
+      "npx prettier --write --config backend/.prettierrc"
+    ],
+    "frontend/src/**/*.{ts,tsx}": [
+      "npx eslint --fix --config frontend/eslint.config.js"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabrielCouto26/financial-center.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gabrielCouto26/financial-center/issues"
+  },
+  "homepage": "https://github.com/gabrielCouto26/financial-center#readme",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0"
+  }
+}
