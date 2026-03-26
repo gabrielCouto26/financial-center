@@ -48,8 +48,8 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
           </aside>
 
           <main className="main-content">
-            <CouplePanel enabled />
-            <TransactionList />
+            <CouplePanel enabled currentUserId={user.id} />
+            <TransactionList currentUserId={user.id} />
           </main>
         </div>
       </section>

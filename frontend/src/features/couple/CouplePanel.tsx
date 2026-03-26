@@ -13,19 +13,26 @@ type FormValues = z.infer<typeof schema>;
 
 type Props = {
   enabled: boolean;
+  currentUserId: string;
 };
 
-export function CouplePanel({ enabled }: Props) {
+export function CouplePanel({ enabled, currentUserId }: Props) {
   const queryClient = useQueryClient();
   const { data: couple, isLoading: isCoupleLoading } = useQuery({
-    queryKey: ['couple'],
+    queryKey: ['couple', currentUserId],
     queryFn: () => apiFetch<CoupleSummary | null>('/couple'),
     enabled,
   });
+  const partner = couple?.partner;
+  const hasValidCouple =
+    Boolean(couple?.id) &&
+    Boolean(partner?.id) &&
+    Boolean(partner?.email) &&
+    Array.isArray(couple?.members);
   const { data: balance, isLoading: isBalanceLoading } = useQuery({
-    queryKey: ['couple-balance'],
+    queryKey: ['couple-balance', currentUserId],
     queryFn: () => apiFetch<CoupleBalance>('/couple/balance'),
-    enabled: enabled && Boolean(couple),
+    enabled: enabled && hasValidCouple,
   });
   const {
     register,
@@ -43,8 +50,8 @@ export function CouplePanel({ enabled }: Props) {
         body: JSON.stringify(values),
       }),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['couple'] });
-      void queryClient.invalidateQueries({ queryKey: ['couple-balance'] });
+      void queryClient.invalidateQueries({ queryKey: ['couple', currentUserId] });
+      void queryClient.invalidateQueries({ queryKey: ['couple-balance', currentUserId] });
       reset();
     },
   });
@@ -62,7 +69,7 @@ export function CouplePanel({ enabled }: Props) {
     );
   }
 
-  if (!couple) {
+  if (!hasValidCouple) {
     return (
       <section className="panel">
         <h2>Couple</h2>
@@ -92,7 +99,7 @@ export function CouplePanel({ enabled }: Props) {
   return (
     <section className="panel">
       <h2>Couple</h2>
-      <p className="hint">Partner linked: <strong>{couple.partner.email}</strong></p>
+      <p className="hint">Partner linked: <strong>{partner?.email}</strong></p>
       {isBalanceLoading && <p>Loading balance…</p>}
       {balance && (
         <div className="balance-grid">

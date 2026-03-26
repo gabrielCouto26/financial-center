@@ -72,10 +72,11 @@ type Props = {
 export function TransactionForm({ currentUserId }: Props) {
   const queryClient = useQueryClient();
   const { data: couple } = useQuery({
-    queryKey: ['couple'],
+    queryKey: ['couple', currentUserId],
     queryFn: () => apiFetch<CoupleSummary | null>('/couple'),
   });
-  const memberIds = couple?.members.map((member) => member.id) ?? [];
+  const coupleMembers = Array.isArray(couple?.members) ? couple.members : [];
+  const memberIds = coupleMembers.map((member) => member.id);
 
   const {
     register,
@@ -119,8 +120,8 @@ export function TransactionForm({ currentUserId }: Props) {
         body: JSON.stringify(thisRequest(values)),
       }),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['transactions'] });
-      void queryClient.invalidateQueries({ queryKey: ['couple-balance'] });
+      void queryClient.invalidateQueries({ queryKey: ['transactions', currentUserId] });
+      void queryClient.invalidateQueries({ queryKey: ['couple-balance', currentUserId] });
       reset({
         date: new Date().toISOString().split('T')[0],
         type: TransactionType.PERSONAL,
@@ -160,7 +161,7 @@ export function TransactionForm({ currentUserId }: Props) {
     }
     setValue(
       'splits',
-      couple.members.map((member, index) => ({
+      coupleMembers.map((member, index) => ({
         userId: member.id,
         percentage: index === 0 ? 50 : 50,
       })),
@@ -241,7 +242,7 @@ export function TransactionForm({ currentUserId }: Props) {
               <label>
                 Paid by
                 <select {...register('paidByUserId')}>
-                  {couple.members.map((member) => (
+                  {coupleMembers.map((member) => (
                     <option key={member.id} value={member.id}>
                       {member.id === currentUserId ? 'You' : couple.partner.email}
                     </option>

@@ -7,15 +7,22 @@ import {
   TransactionType,
 } from '../../types/transaction';
 
-export function TransactionList() {
+type Props = {
+  currentUserId: string;
+};
+
+export function TransactionList({ currentUserId }: Props) {
   const { data: transactions, isLoading } = useQuery({
-    queryKey: ['transactions'],
+    queryKey: ['transactions', currentUserId],
     queryFn: () => apiFetch<Transaction[]>('/transactions'),
   });
   const { data: couple } = useQuery({
-    queryKey: ['couple'],
+    queryKey: ['couple', currentUserId],
     queryFn: () => apiFetch<CoupleSummary | null>('/couple'),
   });
+
+  const partnerId = couple?.partner?.id;
+  const partnerEmail = couple?.partner?.email;
 
   const categoryLabels: Record<Category, string> = {
     [Category.FOOD]: 'Food',
@@ -67,8 +74,8 @@ export function TransactionList() {
                   ? t.splits
                       .map((split) => {
                         const label =
-                          split.userId === couple?.partner.id
-                            ? couple.partner.email
+                          split.userId === partnerId && partnerEmail
+                            ? partnerEmail
                             : 'You';
                         return `${label}: ${split.percentage}%`;
                       })
