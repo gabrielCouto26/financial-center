@@ -24,6 +24,6 @@ export class TransactionsController {
   @Get()
   @UseGuards(AuthGuard('jwt'))
   async findAll(@CurrentUser() user: SafeUser): Promise<TransactionResponse[]> {
-    return this.transactionsService.findAllByUser(user.id);
+    return this.transactionsService.findAllAccessibleByUser(user.id);
   }
 }

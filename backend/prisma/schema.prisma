@@ -9,14 +9,39 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  passwordHash String        @map("password_hash")
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  transactions Transaction[]
+  id               String            @id @default(uuid())
+  email            String            @unique
+  passwordHash     String            @map("password_hash")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  coupleMembership CoupleLinkMember?
+  createdTransactions Transaction[]  @relation("CreatedTransactions")
+  paidTransactions    Transaction[]  @relation("PaidTransactions")
+  transactionSplits   TransactionSplit[]
 
   @@map("users")
+}
+
+model CoupleLink {
+  id        String             @id @default(uuid())
+  createdAt DateTime           @default(now()) @map("created_at")
+  updatedAt DateTime           @updatedAt @map("updated_at")
+  members   CoupleLinkMember[]
+  transactions Transaction[]   @relation("CoupleLinkTransactions")
+
+  @@map("couple_links")
+}
+
+model CoupleLinkMember {
+  id           String     @id @default(uuid())
+  coupleLinkId String     @map("couple_link_id")
+  userId       String     @unique @map("user_id")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  coupleLink   CoupleLink @relation(fields: [coupleLinkId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([coupleLinkId, userId])
+  @@map("couple_link_members")
 }
 
 enum Category {
@@ -31,17 +56,40 @@ enum Category {
   OTHER
 }
 
-model Transaction {
-  id        String   @id @default(uuid())
-  name      String
-  amount    Decimal  @db.Decimal(10, 2)
-  category  Category
-  date      DateTime
-  userId    String   @map("user_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+enum TransactionType {
+  PERSONAL
+  COUPLE
+}
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Transaction {
+  id            String            @id @default(uuid())
+  name          String
+  amount        Decimal           @db.Decimal(10, 2)
+  category      Category
+  type          TransactionType   @default(PERSONAL)
+  date          DateTime
+  creatorUserId String            @map("user_id")
+  paidByUserId  String            @map("paid_by_user_id")
+  coupleLinkId  String?           @map("couple_link_id")
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+  coupleLink    CoupleLink?       @relation("CoupleLinkTransactions", fields: [coupleLinkId], references: [id], onDelete: Cascade)
+  creator       User              @relation("CreatedTransactions", fields: [creatorUserId], references: [id], onDelete: Cascade)
+  payer         User              @relation("PaidTransactions", fields: [paidByUserId], references: [id], onDelete: Cascade)
+  splits        TransactionSplit[]
 
   @@map("transactions")
+}
+
+model TransactionSplit {
+  id            String      @id @default(uuid())
+  transactionId String      @map("transaction_id")
+  userId        String      @map("user_id")
+  percentage    Decimal     @db.Decimal(5, 2)
+  createdAt     DateTime    @default(now()) @map("created_at")
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([transactionId, userId])
+  @@map("transaction_splits")
 }

@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { clearStoredToken } from '../../services/api';
+import { CouplePanel } from '../couple/CouplePanel';
 import { TransactionForm } from '../transactions/TransactionForm';
 import { TransactionList } from '../transactions/TransactionList';
 import type { SafeUser } from '../../types/user';
@@ -18,6 +19,9 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
   function logout() {
     clearStoredToken();
     queryClient.removeQueries({ queryKey: ['me'] });
+    queryClient.removeQueries({ queryKey: ['couple'] });
+    queryClient.removeQueries({ queryKey: ['couple-balance'] });
+    queryClient.removeQueries({ queryKey: ['transactions'] });
     navigate('/', { replace: true });
   }
 
@@ -40,10 +44,11 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
 
         <div className="dashboard-content">
           <aside className="sidebar">
-            <TransactionForm />
+            <TransactionForm currentUserId={user.id} />
           </aside>
 
           <main className="main-content">
+            <CouplePanel enabled />
             <TransactionList />
           </main>
         </div>

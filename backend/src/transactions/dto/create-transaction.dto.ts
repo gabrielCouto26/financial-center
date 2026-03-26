@@ -1,14 +1,30 @@
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
   IsString,
   IsNumber,
   IsEnum,
   IsDateString,
   MinLength,
   IsPositive,
+  IsArray,
+  IsOptional,
+  IsUUID,
+  ValidateNested,
 } from 'class-validator';
-import { Category } from '@prisma/client';
+import { Type } from 'class-transformer';
+import { Category, TransactionType } from '@prisma/client';
 
-export { Category };
+export { Category, TransactionType };
+
+export class CreateTransactionSplitDto {
+  @IsUUID()
+  userId!: string;
+
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @IsPositive()
+  percentage!: number;
+}
 
 export class CreateTransactionDto {
   @IsString()
@@ -24,4 +40,19 @@ export class CreateTransactionDto {
 
   @IsDateString()
   date!: string;
+
+  @IsEnum(TransactionType)
+  type!: TransactionType;
+
+  @IsOptional()
+  @IsUUID()
+  paidByUserId?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(2)
+  @ArrayMaxSize(2)
+  @ValidateNested({ each: true })
+  @Type(() => CreateTransactionSplitDto)
+  splits?: CreateTransactionSplitDto[];
 }
