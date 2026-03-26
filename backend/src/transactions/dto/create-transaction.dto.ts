@@ -1,5 +1,4 @@
 import {
-  ArrayMaxSize,
   ArrayMinSize,
   IsString,
   IsNumber,
@@ -51,8 +50,17 @@ export class CreateTransactionDto {
   @IsOptional()
   @IsArray()
   @ArrayMinSize(2)
-  @ArrayMaxSize(2)
   @ValidateNested({ each: true })
   @Type(() => CreateTransactionSplitDto)
   splits?: CreateTransactionSplitDto[];
+
+  @IsOptional()
+  @IsUUID()
+  groupId?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(2)
+  @IsUUID('4', { each: true })
+  participantUserIds?: string[];
 }

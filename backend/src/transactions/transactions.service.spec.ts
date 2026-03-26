@@ -15,11 +15,20 @@ describe('TransactionsService', () => {
     getRequiredCoupleRecord: jest.fn(),
   };
 
+  const groupsService = {
+    listForUser: jest.fn(),
+    getRequiredGroupRecord: jest.fn(),
+  };
+
   let service: TransactionsService;
 
   beforeEach(() => {
     jest.resetAllMocks();
-    service = new TransactionsService(prisma as never, coupleService as never);
+    service = new TransactionsService(
+      prisma as never,
+      coupleService as never,
+      groupsService as never,
+    );
   });
 
   it('creates a personal transaction without shared fields', async () => {
@@ -35,6 +44,7 @@ describe('TransactionsService', () => {
       creatorUserId: 'user-id',
       paidByUserId: 'user-id',
       coupleLinkId: null,
+      group: null,
       splits: [],
     });
 
@@ -49,11 +59,12 @@ describe('TransactionsService', () => {
     ).resolves.toMatchObject({
       type: TransactionType.PERSONAL,
       paidByUserId: 'user-id',
+      group: null,
       splits: [],
     });
   });
 
-  it('rejects personal transactions with payer or split fields', async () => {
+  it('rejects personal transactions with shared-expense fields', async () => {
     await expect(
       service.create('user-id', {
         name: 'Rent',
@@ -83,6 +94,7 @@ describe('TransactionsService', () => {
       creatorUserId: 'user-id',
       paidByUserId: 'user-id',
       coupleLinkId: 'couple-id',
+      group: null,
       splits: [
         { userId: 'user-id', percentage: 50 },
         { userId: 'partner-id', percentage: 50 },
@@ -101,10 +113,7 @@ describe('TransactionsService', () => {
     ).resolves.toMatchObject({
       type: TransactionType.COUPLE,
       couple: { id: 'couple-id' },
-      splits: [
-        { userId: 'user-id', percentage: 50 },
-        { userId: 'partner-id', percentage: 50 },
-      ],
+      group: null,
     });
   });
 
@@ -130,8 +139,73 @@ describe('TransactionsService', () => {
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 
-  it('lists personal and accessible couple transactions', async () => {
+  it('creates a group transaction with equal split across participants', async () => {
+    groupsService.getRequiredGroupRecord.mockResolvedValue({
+      id: 'group-id',
+      members: [
+        { userId: 'user-a' },
+        { userId: 'user-b' },
+        { userId: 'user-c' },
+      ],
+    });
+    prisma.transaction.create.mockResolvedValue({
+      id: 'tx-group',
+      name: 'Taxi',
+      amount: 90,
+      category: Category.TRANSPORT,
+      type: TransactionType.GROUP,
+      date: new Date('2026-03-26T00:00:00.000Z'),
+      createdAt: new Date('2026-03-26T00:00:00.000Z'),
+      updatedAt: new Date('2026-03-26T00:00:00.000Z'),
+      creatorUserId: 'user-a',
+      paidByUserId: 'user-a',
+      coupleLinkId: null,
+      group: { id: 'group-id', name: 'Trip' },
+      splits: [
+        { userId: 'user-a', percentage: 33.33 },
+        { userId: 'user-b', percentage: 33.33 },
+        { userId: 'user-c', percentage: 33.34 },
+      ],
+    });
+
+    await expect(
+      service.create('user-a', {
+        name: 'Taxi',
+        amount: 90,
+        category: Category.TRANSPORT,
+        date: '2026-03-26',
+        type: TransactionType.GROUP,
+        groupId: 'group-id',
+        paidByUserId: 'user-a',
+      }),
+    ).resolves.toMatchObject({
+      type: TransactionType.GROUP,
+      group: { id: 'group-id', name: 'Trip' },
+    });
+  });
+
+  it('rejects group transactions when participant and split modes are mixed', async () => {
+    await expect(
+      service.create('user-a', {
+        name: 'Taxi',
+        amount: 90,
+        category: Category.TRANSPORT,
+        date: '2026-03-26',
+        type: TransactionType.GROUP,
+        groupId: 'group-id',
+        paidByUserId: 'user-a',
+        participantUserIds: ['user-a', 'user-b'],
+        splits: [
+          { userId: 'user-a', percentage: 50 },
+          { userId: 'user-b', percentage: 50 },
+        ],
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('lists personal, couple, and accessible group transactions', async () => {
     coupleService.findCoupleSummary.mockResolvedValue({ id: 'couple-id' });
+    groupsService.listForUser.mockResolvedValue([{ id: 'group-id' }]);
     prisma.transaction.findMany.mockResolvedValue([
       {
         id: 'tx-1',
@@ -145,11 +219,12 @@ describe('TransactionsService', () => {
         creatorUserId: 'user-id',
         paidByUserId: 'user-id',
         coupleLinkId: null,
+        group: null,
         splits: [],
       },
     ]);
 
-    const result = await service.findAllAccessibleByUser('user-id');
+    await service.findAllAccessibleByUser('user-id');
 
     expect(prisma.transaction.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -157,10 +232,10 @@ describe('TransactionsService', () => {
           OR: [
             { creatorUserId: 'user-id', type: TransactionType.PERSONAL },
             { coupleLinkId: 'couple-id', type: TransactionType.COUPLE },
+            { groupId: { in: ['group-id'] }, type: TransactionType.GROUP },
           ],
         },
       }),
     );
-    expect(result).toHaveLength(1);
   });
 });

@@ -245,8 +245,58 @@ a {
   color: #1d4ed8;
 }
 
+.pill-group {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.group-select {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 1rem;
+}
+
+.group-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.member-list {
+  margin: 0.5rem 0 1rem;
+  padding-left: 1rem;
+}
+
+.settlements h4 {
+  margin-bottom: 0.5rem;
+}
+
+.checkbox-group {
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin: 0;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.balance-card small {
+  color: #555;
+}
+
 @media (max-width: 768px) {
   .dashboard-content {
+    grid-template-columns: 1fr;
+  }
+
+  .group-layout {
     grid-template-columns: 1fr;
   }
 }

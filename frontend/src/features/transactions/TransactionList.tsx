@@ -1,11 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
-import { apiFetch } from '../../services/api';
-import type { CoupleSummary } from '../../types/couple';
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "../../services/api";
+import type { CoupleSummary } from "../../types/couple";
+import type { GroupSummary } from "../../types/group";
 import {
   Category,
   type Transaction,
   TransactionType,
-} from '../../types/transaction';
+} from "../../types/transaction";
 
 type Props = {
   currentUserId: string;
@@ -13,28 +14,61 @@ type Props = {
 
 export function TransactionList({ currentUserId }: Props) {
   const { data: transactions, isLoading } = useQuery({
-    queryKey: ['transactions', currentUserId],
-    queryFn: () => apiFetch<Transaction[]>('/transactions'),
+    queryKey: ["transactions", currentUserId],
+    queryFn: () => apiFetch<Transaction[]>("/transactions"),
   });
   const { data: couple } = useQuery({
-    queryKey: ['couple', currentUserId],
-    queryFn: () => apiFetch<CoupleSummary | null>('/couple'),
+    queryKey: ["couple", currentUserId],
+    queryFn: () => apiFetch<CoupleSummary | null>("/couple"),
+  });
+  const { data: groups } = useQuery({
+    queryKey: ["groups", currentUserId],
+    queryFn: () => apiFetch<GroupSummary[]>("/groups"),
   });
 
-  const partnerId = couple?.partner?.id;
-  const partnerEmail = couple?.partner?.email;
-
   const categoryLabels: Record<Category, string> = {
-    [Category.FOOD]: 'Food',
-    [Category.TRANSPORT]: 'Transport',
-    [Category.HOUSING]: 'Housing',
-    [Category.ENTERTAINMENT]: 'Entertainment',
-    [Category.HEALTH]: 'Health',
-    [Category.SHOPPING]: 'Shopping',
-    [Category.EDUCATION]: 'Education',
-    [Category.UTILITIES]: 'Utilities',
-    [Category.OTHER]: 'Other',
+    [Category.FOOD]: "Food",
+    [Category.TRANSPORT]: "Transport",
+    [Category.HOUSING]: "Housing",
+    [Category.ENTERTAINMENT]: "Entertainment",
+    [Category.HEALTH]: "Health",
+    [Category.SHOPPING]: "Shopping",
+    [Category.EDUCATION]: "Education",
+    [Category.UTILITIES]: "Utilities",
+    [Category.OTHER]: "Other",
   };
+
+  function formatSplit(transaction: Transaction): string {
+    if (transaction.type === TransactionType.PERSONAL) {
+      return "Self";
+    }
+
+    if (transaction.type === TransactionType.COUPLE) {
+      return transaction.splits
+        .map((split) => {
+          const label =
+            split.userId === couple?.partner?.id && couple?.partner?.email
+              ? couple.partner.email
+              : "You";
+          return `${label}: ${split.percentage}%`;
+        })
+        .join(" · ");
+    }
+
+    const group = groups?.find((item) => item.id === transaction.group?.id);
+    return `${group?.name ?? transaction.group?.name ?? "Group"} · ${transaction.splits.length} participants`;
+  }
+
+  function pillLabel(type: TransactionType): string {
+    switch (type) {
+      case TransactionType.COUPLE:
+        return "Couple";
+      case TransactionType.GROUP:
+        return "Group";
+      default:
+        return "Personal";
+    }
+  }
 
   if (isLoading) {
     return <p>Loading transactions…</p>;
@@ -59,31 +93,27 @@ export function TransactionList({ currentUserId }: Props) {
           </tr>
         </thead>
         <tbody>
-          {transactions.map((t: Transaction) => (
-            <tr key={t.id}>
-              <td>{new Date(t.date).toLocaleDateString()}</td>
-              <td>{t.name}</td>
+          {transactions.map((transaction) => (
+            <tr key={transaction.id}>
+              <td>{new Date(transaction.date).toLocaleDateString()}</td>
+              <td>{transaction.name}</td>
               <td>
-                <span className={t.type === TransactionType.COUPLE ? 'pill pill-couple' : 'pill'}>
-                  {t.type === TransactionType.COUPLE ? 'Couple' : 'Personal'}
+                <span
+                  className={
+                    transaction.type === TransactionType.COUPLE
+                      ? "pill pill-couple"
+                      : transaction.type === TransactionType.GROUP
+                        ? "pill pill-group"
+                        : "pill"
+                  }
+                >
+                  {pillLabel(transaction.type)}
                 </span>
               </td>
-              <td>{categoryLabels[t.category]}</td>
-              <td>
-                {t.type === TransactionType.COUPLE
-                  ? t.splits
-                      .map((split) => {
-                        const label =
-                          split.userId === partnerId && partnerEmail
-                            ? partnerEmail
-                            : 'You';
-                        return `${label}: ${split.percentage}%`;
-                      })
-                      .join(' · ')
-                  : 'Self'}
-              </td>
+              <td>{categoryLabels[transaction.category]}</td>
+              <td>{formatSplit(transaction)}</td>
               <td className="amount">
-                ${Number(t.amount).toFixed(2)}
+                ${Number(transaction.amount).toFixed(2)}
               </td>
             </tr>
           ))}

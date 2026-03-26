@@ -1,7 +1,7 @@
 # Estado do Projeto – Centro Financeiro Social
 
-> Última atualização: 2026-03-24
-> Branch: feature/cursor
+> Última atualização: 2026-03-26
+> Branch: feature/couple
 
 ## Visão Geral
 
@@ -36,19 +36,40 @@ O projeto é uma aplicação de gerenciamento financeiro com foco em despesas pe
   - Lista em tabela com formatação de valores e datas.
 - **Observações**: Todas as transações são vinculadas ao usuário autenticado (user-scoped). Não há compartilhamento (couple/group) ainda.
 
+### Relacionamentos de Casal (Épico 3)
+
+- **O que foi feito**: Implementação do modelo `Relationship` para vincular dois usuários como casal, com suporte a transações compartilhadas e split de despesas.
+- **Arquivos principais**:
+  - `backend/prisma/schema.prisma`: Modelo Relationship, CoupleTransaction e enum TransactionType.
+  - `backend/prisma/migrations/20260326090000_add_couple_transactions/`: Migration criada.
+  - `backend/src/couple/`: Novo módulo com CoupleService, CoupleController e DTO.
+  - `backend/src/couple/dto/link-couple.dto.ts`: DTO com email validation para linking de casais.
+  - `backend/src/transactions/`: TransactionsService e Controller atualizados para suportar couple transactions.
+  - `frontend/src/features/couple/CouplePanel.tsx`: Novo componente para gerenciar linking de casal e exibir saldo.
+  - `frontend/src/types/couple.ts`: Tipos para relacionamentos de casal.
+  - `frontend/src/features/transactions/`: TransactionForm e TransactionList atualizados.
+- **Funcionalidades**:
+  - Linking de usuários via email (criação de convite/relacionamento).
+  - Transações pessoais e transações de casal com split de despesas (percentual configurável).
+  - Listagem de transações com detalhes do casal e percentuais de split.
+  - CouplePanel exibindo status do casal e saldo compartilhado.
+- **Observações**: O sistema agora diferencia transações pessoais de transações de casal, com suporte a múltiplas formas de split.
+
 ## Onde o Desenvolvimento Parou
 
-- **Em progresso**: Épico 2 (Transações) **concluído**. Próximo: Épico 3 (Relacionamentos de Casal) ou Épico 4 (Grupos).
+- **Em progresso**: Épico 3 (Relacionamentos de Casal) **implementado**. Próximo: Épico 4 (Grupos) ou refinamentos de UX/validações.
 - **Próximos passos**:
-  1. Implementar modelo `Relationship` para casais (convite, aceite, vinculação).
-  2. Adicionar lógica de split de despesas entre casal.
-  3. Implementar modelo `Group` para despesas em grupo.
-  4. Adicionar cálculos de saldos e relatórios básicos.
+  1. Implementar modelo `Group` para despesas em grupo (com múltiplos membros).
+  2. Adicionar endpoints de convites e aceites (se ainda não houver fluxo completo).
+  3. Implementar lógica de dividir despesas entre N pessoas no grupo.
+  4. Adicionar cálculos avançados de saldos e relatórios financeiros.
+  5. Melhorar validações e tratamento de erros na API.
 - **Pendências**:
-  - Modelos de dados para relacionamentos de casal e grupos.
-  - Endpoints de convites, aceites e gerenciamento de membros.
-  - Lógica de divisão de despesas (split rules).
-  - Dashboard com resumo financeiro e relatórios.
+  - Modelo completo de `Group` e endpoints associados.
+  - Lógica de convites e aceites para grupos.
+  - Cálculos de saldo consolidados (pessoal + casal + grupos).
+  - Dashboard com resumo financeiro e relatórios detalhados.
+  - Testes end-to-end para fluxos de casal.
 
 ## Endpoints / APIs (Estado Atual)
 
@@ -56,11 +77,14 @@ O projeto é uma aplicação de gerenciamento financeiro com foco em despesas pe
   - `POST /auth/register`: Cadastro de novo usuário.
   - `POST /auth/login`: Login e recebimento de JWT.
   - `GET /auth/me`: Perfil do usuário logado.
-  - `POST /transactions`: Criar transação (requer JWT).
-  - `GET /transactions`: Listar transações do usuário (requer JWT).
+  - `POST /transactions`: Criar transação (pessoal ou de casal, requer JWT).
+  - `GET /transactions`: Listar transações do usuário com detalhes de casal (requer JWT).
+  - `POST /couple/link`: Vincular usuário a um casal via email.
+  - `GET /couple`: Obter informações do casal do usuário logado.
 - **Não implementados**:
-  - Endpoints de `relationships` (casal) e `groups`.
-  - Endpoints de split de despesas e cálculos de saldo.
+  - Endpoints de `groups` (despesas em grupo).
+  - Endpoints de convites e aceites formalizados.
+  - Endpoints de split de despesas e cálculos de saldo consolidados.
 
 ## Estrutura de Arquivos Relevantes
 
@@ -70,22 +94,29 @@ O projeto é uma aplicação de gerenciamento financeiro com foco em despesas pe
 │   ├── src/
 │   │   ├── auth/              # JWT, Bcrypt, Login/Register
 │   │   ├── users/             # User Service/Module
-│   │   ├── transactions/      # Transaction domain (Epic 2)
+│   │   ├── couple/            # Couple Service/Module (Épico 3)
+│   │   │   ├── couple.controller.ts
+│   │   │   ├── couple.service.ts
+│   │   │   └── dto/
+│   │   │       └── link-couple.dto.ts
+│   │   ├── transactions/      # Transaction domain (Epic 2 + 3)
 │   │   │   ├── transactions.controller.ts
 │   │   │   ├── transactions.service.ts
 │   │   │   └── dto/
+│   │   │       └── create-transaction.dto.ts
 │   │   └── prisma/            # Prisma Service
 │   └── prisma/
-│       ├── schema.prisma      # Definição do banco (User, Transaction, Category)
-│       └── migrations/        # Migration Epic 2 aplicada
+│       ├── schema.prisma      # User, Transaction, Relationship, CoupleTransaction
+│       └── migrations/        # Migrations (Epic 2 + Epic 3)
 ├── frontend/
 │   ├── src/
 │   │   ├── features/
 │   │   │   ├── auth/          # LoginPage, RegisterPage
+│   │   │   ├── couple/        # CouplePanel (Épico 3)
 │   │   │   ├── dashboard/     # HomePage com dashboard layout
 │   │   │   └── transactions/  # TransactionForm, TransactionList
 │   │   ├── services/          # apiFetch
-│   │   └── types/             # transaction.ts (Category enum, interfaces)
+│   │   └── types/             # transaction.ts, couple.ts (Épico 3)
 │   └── index.css              # Dashboard styles
 └── docs/                      # PRD e Backlog Técnico
 ```

@@ -18,6 +18,8 @@ model User {
   createdTransactions Transaction[]  @relation("CreatedTransactions")
   paidTransactions    Transaction[]  @relation("PaidTransactions")
   transactionSplits   TransactionSplit[]
+  createdGroups       Group[]        @relation("CreatedGroups")
+  groupMemberships    GroupMember[]
 
   @@map("users")
 }
@@ -59,6 +61,32 @@ enum Category {
 enum TransactionType {
   PERSONAL
   COUPLE
+  GROUP
+}
+
+model Group {
+  id              String        @id @default(uuid())
+  name            String
+  createdByUserId String        @map("created_by_user_id")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  createdBy       User          @relation("CreatedGroups", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  members         GroupMember[]
+  transactions    Transaction[] @relation("GroupTransactions")
+
+  @@map("groups")
+}
+
+model GroupMember {
+  id        String   @id @default(uuid())
+  groupId    String   @map("group_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@map("group_members")
 }
 
 model Transaction {
@@ -71,9 +99,11 @@ model Transaction {
   creatorUserId String            @map("user_id")
   paidByUserId  String            @map("paid_by_user_id")
   coupleLinkId  String?           @map("couple_link_id")
+  groupId       String?           @map("group_id")
   createdAt     DateTime          @default(now()) @map("created_at")
   updatedAt     DateTime          @updatedAt @map("updated_at")
   coupleLink    CoupleLink?       @relation("CoupleLinkTransactions", fields: [coupleLinkId], references: [id], onDelete: Cascade)
+  group         Group?            @relation("GroupTransactions", fields: [groupId], references: [id], onDelete: Cascade)
   creator       User              @relation("CreatedTransactions", fields: [creatorUserId], references: [id], onDelete: Cascade)
   payer         User              @relation("PaidTransactions", fields: [paidByUserId], references: [id], onDelete: Cascade)
   splits        TransactionSplit[]
