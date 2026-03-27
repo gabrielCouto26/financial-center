@@ -59,6 +59,11 @@ export type GroupBalanceResponse = {
   settlements: GroupSettlement[];
 };
 
+export type GroupDashboardSummary = {
+  totalNet: number;
+  groupCount: number;
+};
+
 @Injectable()
 export class GroupsService {
   constructor(
@@ -229,6 +234,55 @@ export class GroupsService {
       group: { id: group.id, name: group.name },
       members: normalizedMembers,
       settlements: this.buildSettlements(normalizedMembers),
+    };
+  }
+
+  async getDashboardSummary(userId: string): Promise<GroupDashboardSummary> {
+    const groups = await this.prisma.group.findMany({
+      where: {
+        members: {
+          some: { userId },
+        },
+      },
+      include: {
+        members: {
+          select: { userId: true },
+        },
+      },
+    });
+
+    if (groups.length === 0) {
+      return { totalNet: 0, groupCount: 0 };
+    }
+
+    const transactions = await this.prisma.transaction.findMany({
+      where: {
+        type: TransactionType.GROUP,
+        groupId: { in: groups.map((group) => group.id) },
+      },
+      include: {
+        splits: true,
+      },
+    });
+
+    let totalNet = 0;
+    for (const transaction of transactions) {
+      const amount = Number(transaction.amount);
+      if (transaction.paidByUserId === userId) {
+        totalNet += amount;
+      }
+
+      const userSplit = transaction.splits.find(
+        (split) => split.userId === userId,
+      );
+      if (userSplit) {
+        totalNet -= amount * (Number(userSplit.percentage) / 100);
+      }
+    }
+
+    return {
+      totalNet: this.roundCurrency(totalNet),
+      groupCount: groups.length,
     };
   }
 

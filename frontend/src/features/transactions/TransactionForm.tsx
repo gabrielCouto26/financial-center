@@ -210,6 +210,9 @@ export function TransactionForm({ currentUserId }: Props) {
         queryKey: ["transactions", currentUserId],
       });
       void queryClient.invalidateQueries({
+        queryKey: ["dashboard", currentUserId],
+      });
+      void queryClient.invalidateQueries({
         queryKey: ["couple-balance", currentUserId],
       });
       void queryClient.invalidateQueries({

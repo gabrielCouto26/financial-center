@@ -52,6 +52,7 @@ export function CouplePanel({ enabled, currentUserId }: Props) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['couple', currentUserId] });
       void queryClient.invalidateQueries({ queryKey: ['couple-balance', currentUserId] });
+      void queryClient.invalidateQueries({ queryKey: ['dashboard', currentUserId] });
       reset();
     },
   });

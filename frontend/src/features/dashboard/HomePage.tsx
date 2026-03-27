@@ -1,10 +1,14 @@
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
-import { clearStoredToken } from '../../services/api';
+import { apiFetch, clearStoredToken } from '../../services/api';
 import { CouplePanel } from '../couple/CouplePanel';
+import { CoupleOverviewCard } from './CoupleOverviewCard';
 import { GroupPanel } from '../groups/GroupPanel';
+import { GroupsOverviewCard } from './GroupsOverviewCard';
+import { RecentTransactionsCard } from './RecentTransactionsCard';
+import { SummaryCards } from './SummaryCards';
 import { TransactionForm } from '../transactions/TransactionForm';
-import { TransactionList } from '../transactions/TransactionList';
+import type { DashboardData } from '../../types/dashboard';
 import type { SafeUser } from '../../types/user';
 
 type Props = {
@@ -16,6 +20,11 @@ type Props = {
 export function HomePage({ user, isLoading, hasToken }: Props) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { data: dashboard, isLoading: isDashboardLoading } = useQuery({
+    queryKey: ['dashboard', user?.id],
+    queryFn: () => apiFetch<DashboardData>('/dashboard'),
+    enabled: Boolean(user?.id),
+  });
 
   function logout() {
     clearStoredToken();
@@ -25,6 +34,7 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
     queryClient.removeQueries({ queryKey: ['groups'] });
     queryClient.removeQueries({ queryKey: ['group-detail'] });
     queryClient.removeQueries({ queryKey: ['group-balance'] });
+    queryClient.removeQueries({ queryKey: ['dashboard'] });
     queryClient.removeQueries({ queryKey: ['transactions'] });
     navigate('/', { replace: true });
   }
@@ -34,6 +44,10 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
   }
 
   if (hasToken && user) {
+    if (isDashboardLoading || !dashboard) {
+      return <p>Loading dashboard…</p>;
+    }
+
     return (
       <section>
         <header className="dashboard-header">
@@ -52,9 +66,21 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
           </aside>
 
           <main className="main-content">
-            <CouplePanel enabled currentUserId={user.id} />
-            <GroupPanel currentUserId={user.id} />
-            <TransactionList currentUserId={user.id} />
+            <SummaryCards
+              summary={dashboard.summary}
+              month={dashboard.period.month}
+            />
+            <div className="overview-grid">
+              <CoupleOverviewCard couple={dashboard.couple} />
+              <GroupsOverviewCard groups={dashboard.groups} />
+            </div>
+            <RecentTransactionsCard
+              transactions={dashboard.recentTransactions}
+            />
+            <div className="management-grid">
+              <CouplePanel enabled currentUserId={user.id} />
+              <GroupPanel currentUserId={user.id} />
+            </div>
           </main>
         </div>
       </section>

@@ -63,9 +63,25 @@ export class TransactionsService {
   async findAllAccessibleByUser(
     userId: string,
   ): Promise<TransactionResponse[]> {
+    const transactions = await this.findAccessibleTransactions(userId);
+    return transactions.map((transaction) => this.mapToResponse(transaction));
+  }
+
+  async findRecentAccessibleByUser(
+    userId: string,
+    limit: number,
+  ): Promise<TransactionResponse[]> {
+    const transactions = await this.findAccessibleTransactions(userId, limit);
+    return transactions.map((transaction) => this.mapToResponse(transaction));
+  }
+
+  private async findAccessibleTransactions(
+    userId: string,
+    limit?: number,
+  ): Promise<TransactionRecord[]> {
     const couple = await this.coupleService.findCoupleSummary(userId);
     const groups = await this.groupsService.listForUser(userId);
-    const transactions = await this.prisma.transaction.findMany({
+    return this.prisma.transaction.findMany({
       where: {
         OR: [
           {
@@ -97,9 +113,8 @@ export class TransactionsService {
         group: true,
       },
       orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
+      ...(typeof limit === 'number' ? { take: limit } : {}),
     });
-
-    return transactions.map((transaction) => this.mapToResponse(transaction));
   }
 
   private async createPersonal(

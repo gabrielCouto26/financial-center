@@ -48,6 +48,13 @@ export type CoupleBalanceResponse = {
   owedToYou: number;
 };
 
+export type CoupleDashboardSummary = {
+  isLinked: boolean;
+  youOwe: number;
+  owedToYou: number;
+  net: number;
+};
+
 @Injectable()
 export class CoupleService {
   constructor(
@@ -166,6 +173,26 @@ export class CoupleService {
       net,
       youOwe: net < 0 ? this.roundCurrency(Math.abs(net)) : 0,
       owedToYou: net > 0 ? net : 0,
+    };
+  }
+
+  async getDashboardSummary(userId: string): Promise<CoupleDashboardSummary> {
+    const couple = await this.findCoupleRecordByUserId(userId);
+    if (!couple) {
+      return {
+        isLinked: false,
+        youOwe: 0,
+        owedToYou: 0,
+        net: 0,
+      };
+    }
+
+    const balance = await this.getBalance(userId);
+    return {
+      isLinked: true,
+      youOwe: balance.youOwe,
+      owedToYou: balance.owedToYou,
+      net: balance.net,
     };
   }
 

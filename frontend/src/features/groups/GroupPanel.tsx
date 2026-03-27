@@ -68,6 +68,7 @@ export function GroupPanel({ currentUserId }: Props) {
       }),
     onSuccess: (group) => {
       void queryClient.invalidateQueries({ queryKey: ['groups', currentUserId] });
+      void queryClient.invalidateQueries({ queryKey: ['dashboard', currentUserId] });
       setSelectedGroupId(group.id);
       createGroupForm.reset();
     },
@@ -87,6 +88,7 @@ export function GroupPanel({ currentUserId }: Props) {
         queryKey: ['group-balance', currentUserId, selectedGroupId],
       });
       void queryClient.invalidateQueries({ queryKey: ['groups', currentUserId] });
+      void queryClient.invalidateQueries({ queryKey: ['dashboard', currentUserId] });
       addMemberForm.reset();
     },
   });
