@@ -3,7 +3,9 @@ import { Link, Navigate, Route, Routes } from 'react-router-dom';
 import { HomePage } from './features/dashboard/HomePage';
 import { LoginPage } from './features/auth/LoginPage';
 import { RegisterPage } from './features/auth/RegisterPage';
+import { ComponentLab } from './features/dev/ComponentLab';
 import { apiFetch, getStoredToken } from './services/api';
+
 import type { SafeUser } from './types/user';
 
 export function App() {
@@ -49,7 +51,9 @@ export function App() {
             path="/register"
             element={token ? <Navigate to="/" replace /> : <RegisterPage />}
           />
+          <Route path="/dev/lab" element={<ComponentLab />} />
           <Route path="*" element={<Navigate to="/" replace />} />
+
         </Routes>
       </main>
     </div>

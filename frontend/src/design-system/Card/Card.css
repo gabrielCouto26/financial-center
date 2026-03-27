@@ -1,0 +1,21 @@
+.ds-card {
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-surface);
+  box-shadow: var(--shadow-md);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+}
+
+.ds-card--primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.ds-card--insight {
+  background: var(--color-insight-gradient);
+  color: var(--color-text-inverse);
+}
+
+.ds-card--insight h3 {
+  color: var(--color-text-inverse);
+}

@@ -1,0 +1,52 @@
+.ds-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.ds-input__label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+}
+
+.ds-input__field {
+  width: 100%;
+  font-family: var(--font-primary);
+  font-size: 16px;
+  padding: var(--space-2) 0;
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+}
+
+.ds-input__field:focus {
+  outline: none;
+}
+
+/* Underlined variant */
+.ds-input--underlined .ds-input__field {
+  border-bottom: 2px solid var(--color-neutral-200);
+}
+
+.ds-input--underlined .ds-input__field:focus {
+  border-bottom-color: var(--color-primary);
+}
+
+.ds-input--error .ds-input__field {
+  border-bottom-color: var(--color-accent) !important;
+}
+
+.ds-input__error-msg {
+  font-size: 12px;
+  color: var(--color-accent);
+  margin: 0;
+}
+
+.ds-input--underlined .ds-input__field::placeholder {
+  color: var(--color-text-muted);
+}

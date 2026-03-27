@@ -1,7 +1,7 @@
 # Estado do Projeto – Centro Financeiro Social
 
-> Última atualização: 2026-03-26
-> Branch: feature/couple
+> Última atualização: 2026-03-27 (Design System Inicial)
+> Branch: feature/dashboard
 
 ## Visão Geral
 
@@ -55,36 +55,107 @@ O projeto é uma aplicação de gerenciamento financeiro com foco em despesas pe
   - CouplePanel exibindo status do casal e saldo compartilhado.
 - **Observações**: O sistema agora diferencia transações pessoais de transações de casal, com suporte a múltiplas formas de split.
 
+### Grupos e Despesas em Grupo (Épico 4)
+
+- **O que foi feito**: Implementação do módulo `Group` para despesas compartilhadas entre múltiplos usuários, com suporte a split igualitário ou porcentual, e cálculo de saldos e acertos.
+- **Arquivos principais**:
+  - `backend/prisma/schema.prisma`: Modelos `Group`, `GroupMember` e atualização de `TransactionType` com `GROUP`.
+  - `backend/prisma/migrations/`: Migration para as tabelas de grupos.
+  - `backend/src/groups/`: Novo módulo completo com GroupsController, GroupsService e DTOs.
+  - `backend/src/transactions/`: Atualizado para suportar transações do tipo `GROUP` com validações específicas.
+  - `frontend/src/features/groups/`: Novos componentes para criação, listagem e gerenciamento de grupos.
+  - `frontend/src/features/transactions/`: TransactionForm e TransactionList refatorados para suportar os 3 modos (PERSONAL, COUPLE, GROUP).
+  - `frontend/src/types/group.ts`: Tipos para grupos.
+- **Funcionalidades**:
+  - Criação de grupos com nome definido pelo usuário.
+  - Adição de membros a grupos (usuários devem estar registrados).
+  - Transações de grupo com split igualitário (todos membros ou subconjunto) ou porcentual customizado.
+  - Endpoint `GET /groups/:groupId/balance` retornando saldos por membro (`paid`, `share`, `net`) e lista de acertos (`settlements`).
+  - Autorização: apenas membros do grupo podem ver dados e criar transações.
+- **Endpoints de Grupo**:
+  - `POST /groups`: Criar grupo (criador é auto-adicionado como membro).
+  - `GET /groups`: Listar grupos do usuário logado.
+  - `GET /groups/:groupId`: Obter detalhes de um grupo específico.
+  - `POST /groups/:groupId/members`: Adicionar membro ao grupo via email.
+  - `GET /groups/:groupId/balance`: Obter saldo e acertos do grupo.
+- **Observações**: O contrato de transações foi generalizado para suportar 3 modos. Validações específicas por tipo garantem integridade dos dados.
+
+### Dashboard Consolidado (Resumo Global)
+
+- **O que foi feito**: Backend ganhou módulo `Dashboard` para agregar métricas mensais e saldo líquido combinando contextos pessoal, casal e grupos. Frontend recebeu uma HomePage reestruturada com cards de resumo, visões rápidas de casal/grupos, tabela de transações recentes e acesso direto aos painéis de gestão.
+- **Arquivos principais**:
+  - `backend/src/dashboard/`: Controller, service e módulo importado em `app.module.ts`.
+  - `frontend/src/features/dashboard/`: HomePage, SummaryCards, CoupleOverviewCard, GroupsOverviewCard, RecentTransactionsCard.
+  - `frontend/src/types/dashboard.ts`: Tipagem da resposta de `/dashboard`.
+  - `frontend/src/index.css`: Estilos do layout (hero cards, grids, sidebar + main content).
+- **Funcionalidades**:
+  - Endpoint `GET /dashboard` (JWT) retorna período corrente (YYYY-MM), gasto do mês, saldo líquido agregado, resumo do casal (youOwe/owedToYou/net), resumo de grupos (groupCount/totalNet) e últimas 10 transações acessíveis.
+  - Cálculo de gasto do mês considera splits de casal/grupo; saldo líquido soma pessoal + net do casal + net dos grupos.
+  - HomePage exibe formulário de transação na sidebar, cards de métricas, visões rápidas e tabela de recentes; mantém CouplePanel e GroupPanel no grid de gestão.
+- **Observações**: Métricas arredondadas para 2 casas; transações recentes ordenadas por data/createdAt; logout limpa caches de queries (me, couple, groups, dashboard, transactions) para evitar dados stale.
+
+### Design System & UI Components (Épico 5 - Inicial)
+
+- **O que foi feito**: Implementação da base do Design System ("Editorial Finance") com tokens sincronizados do Figma, fontes customizadas, e componentes UI atômicos reutilizáveis.
+- **Arquivos principais**:
+  - `frontend/src/design-system/tokens.json`: Definição de cores, tipografia, espaçamento e raios.
+  - `frontend/src/design-system/Button/`: Componente Button com variantes (primary, secondary, text).
+  - `frontend/src/design-system/Input/`: Componente Input com estilo "underlined".
+  - `frontend/src/design-system/Card/`: Componente Card com variantes (primary, insight).
+  - `frontend/src/design-system/Badge/`: Componente Badge para status e tendências.
+  - `frontend/src/design-system/Icons/`: Biblioteca de ícones internos (SVG).
+  - `frontend/src/features/dev/ComponentLab.tsx`: Página de laboratório para visualização e teste dos componentes.
+- **Funcionalidades**:
+  - Uso de CSS Variables injetadas no `:root` a partir dos tokens.
+  - Suporte a temas e consistência visual rigorosa com o Figma.
+  - Implementação de variantes visuais complexas (ex: Insight Card com gradientes).
+- **Observações**: O `index.css` foi refatorado para usar as novas variáveis mantendo retrocompatibilidade com o layout legado.
+
 ## Onde o Desenvolvimento Parou
 
-- **Em progresso**: Épico 3 (Relacionamentos de Casal) **implementado**. Próximo: Épico 4 (Grupos) ou refinamentos de UX/validações.
+- **Status**: Design System base implementado e validado. Dashboard consolidado operacional.
 - **Próximos passos**:
-  1. Implementar modelo `Group` para despesas em grupo (com múltiplos membros).
-  2. Adicionar endpoints de convites e aceites (se ainda não houver fluxo completo).
-  3. Implementar lógica de dividir despesas entre N pessoas no grupo.
-  4. Adicionar cálculos avançados de saldos e relatórios financeiros.
-  5. Melhorar validações e tratamento de erros na API.
+  1. Migrar os componentes das páginas existentes (`HomePage`, `LoginPage`, `RegisterPage`) para os novos componentes do Design System.
+  2. Implementar despesas recorrentes e agendadas.
+  3. Refinar UX do dashboard (filtros de período, drill-down por contexto).
+  4. Implementar edição e exclusão de grupos/membros.
 - **Pendências**:
-  - Modelo completo de `Group` e endpoints associados.
-  - Lógica de convites e aceites para grupos.
-  - Cálculos de saldo consolidados (pessoal + casal + grupos).
-  - Dashboard com resumo financeiro e relatórios detalhados.
-  - Testes end-to-end para fluxos de casal.
+  - Migração de telas legadas para o novo Design System.
+  - Edição e exclusão de grupos.
+  - Relatórios detalhados.
+
 
 ## Endpoints / APIs (Estado Atual)
 
-- **Implementados**:
+- **Autenticação**:
   - `POST /auth/register`: Cadastro de novo usuário.
   - `POST /auth/login`: Login e recebimento de JWT.
   - `GET /auth/me`: Perfil do usuário logado.
-  - `POST /transactions`: Criar transação (pessoal ou de casal, requer JWT).
-  - `GET /transactions`: Listar transações do usuário com detalhes de casal (requer JWT).
+
+- **Transações** (unificadas para 3 modos):
+  - `POST /transactions`: Criar transação (pessoal, casal ou grupo, requer JWT).
+    - `PERSONAL`: transação individual.
+    - `COUPLE`: transação de casal com `paidByUserId` e `splits`.
+    - `GROUP`: transação de grupo com `groupId`, `paidByUserId`, e split igualitário ou porcentual.
+  - `GET /transactions`: Listar transações acessíveis ao usuário (próprias + casal + grupos que participa).
+
+- **Casal**:
   - `POST /couple/link`: Vincular usuário a um casal via email.
   - `GET /couple`: Obter informações do casal do usuário logado.
-- **Não implementados**:
-  - Endpoints de `groups` (despesas em grupo).
-  - Endpoints de convites e aceites formalizados.
-  - Endpoints de split de despesas e cálculos de saldo consolidados.
+
+- **Grupos**:
+  - `POST /groups`: Criar novo grupo (criador vira membro automaticamente).
+  - `GET /groups`: Listar grupos do usuário logado.
+  - `GET /groups/:groupId`: Obter detalhes de um grupo específico.
+  - `POST /groups/:groupId/members`: Adicionar membro ao grupo via email.
+  - `GET /groups/:groupId/balance`: Obter saldo do grupo com `paid`, `share`, `net` por membro e lista de acertos (`settlements`).
+
+- **Dashboard**:
+  - `GET /dashboard`: Retorna mês corrente, gasto do mês, saldo líquido agregado, resumo de casal (youOwe/owedToYou/net), resumo de grupos (count/net) e últimas 10 transações acessíveis.
+
+- **Contratos de Resposta**:
+  - Transações retornam metadados expandidos: `couple`, `group`, e `splits`.
+  - Grupos retornam apenas para membros autorizados.
 
 ## Estrutura de Arquivos Relevantes
 
@@ -99,26 +170,41 @@ O projeto é uma aplicação de gerenciamento financeiro com foco em despesas pe
 │   │   │   ├── couple.service.ts
 │   │   │   └── dto/
 │   │   │       └── link-couple.dto.ts
-│   │   ├── transactions/      # Transaction domain (Epic 2 + 3)
+│   │   ├── groups/            # Groups Service/Module (Épico 4 - NOVO)
+│   │   │   ├── groups.controller.ts
+│   │   │   ├── groups.service.ts
+│   │   │   └── dto/
+│   │   │       ├── create-group.dto.ts
+│   │   │       └── add-member.dto.ts
+│   │   ├── dashboard/         # Dashboard Service/Module (overview consolidado)
+│   │   ├── transactions/      # Transaction domain (Epic 2, 3, 4)
 │   │   │   ├── transactions.controller.ts
 │   │   │   ├── transactions.service.ts
 │   │   │   └── dto/
 │   │   │       └── create-transaction.dto.ts
 │   │   └── prisma/            # Prisma Service
 │   └── prisma/
-│       ├── schema.prisma      # User, Transaction, Relationship, CoupleTransaction
-│       └── migrations/        # Migrations (Epic 2 + Epic 3)
+│       ├── schema.prisma      # User, Transaction, Relationship, CoupleTransaction, Group, GroupMember
+│       └── migrations/        # Migrations (Epic 2, 3, 4)
 ├── frontend/
 │   ├── src/
+│   │   ├── design-system/     # Design Tokens e Componentes Atômicos (NOVO)
+│   │   │   ├── Button/
+│   │   │   ├── Input/
+│   │   │   ├── Card/
+│   │   │   └── Icons/
 │   │   ├── features/
 │   │   │   ├── auth/          # LoginPage, RegisterPage
+│   │   │   ├── dev/           # ComponentLab (NOVO)
 │   │   │   ├── couple/        # CouplePanel (Épico 3)
-│   │   │   ├── dashboard/     # HomePage com dashboard layout
+│   │   │   ├── groups/        # GroupList, GroupDetail, GroupForm
+│   │   │   ├── dashboard/     # HomePage reestruturada + cards de overview
 │   │   │   └── transactions/  # TransactionForm, TransactionList
 │   │   ├── services/          # apiFetch
-│   │   └── types/             # transaction.ts, couple.ts (Épico 3)
-│   └── index.css              # Dashboard styles
-└── docs/                      # PRD e Backlog Técnico
+│   │   └── types/             # Tipagens globais
+│   └── index.css              # Global styles & CSS Variables (Refatorado)
+├── docs/                      # PRD e Backlog Técnico
+└── epic-4.md                  # Plano de implementação do Épico 4
 ```
 
 ## Comandos Úteis
