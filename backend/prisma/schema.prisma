@@ -66,6 +66,11 @@ enum TransactionType {
   GROUP
 }
 
+enum TransactionDirection {
+  INCOME
+  EXPENSE
+}
+
 model Group {
   id              String        @id @default(uuid())
   name            String
@@ -97,6 +102,7 @@ model Transaction {
   amount        Decimal           @db.Decimal(10, 2)
   category      Category
   type          TransactionType   @default(PERSONAL)
+  direction     TransactionDirection @default(EXPENSE)
   date          DateTime
   creatorUserId String            @map("user_id")
   paidByUserId  String            @map("paid_by_user_id")

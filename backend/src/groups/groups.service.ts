@@ -5,7 +5,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Group, TransactionType, User } from '@prisma/client';
+import {
+  Group,
+  TransactionDirection,
+  TransactionType,
+  User,
+} from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from '../users/users.service';
 
@@ -62,6 +67,11 @@ export type GroupBalanceResponse = {
 export type GroupDashboardSummary = {
   totalNet: number;
   groupCount: number;
+  items: Array<{
+    id: string;
+    name: string;
+    net: number;
+  }>;
 };
 
 @Injectable()
@@ -209,9 +219,13 @@ export class GroupsService {
 
     for (const transaction of transactions) {
       const amount = Number(transaction.amount);
+      const signedAmount =
+        transaction.direction === TransactionDirection.INCOME
+          ? -amount
+          : amount;
       const payer = byId.get(transaction.paidByUserId);
       if (payer) {
-        payer.paid += amount;
+        payer.paid += signedAmount;
       }
 
       for (const split of transaction.splits) {
@@ -219,7 +233,7 @@ export class GroupsService {
         if (!member) {
           continue;
         }
-        member.share += amount * (Number(split.percentage) / 100);
+        member.share += signedAmount * (Number(split.percentage) / 100);
       }
     }
 
@@ -252,7 +266,7 @@ export class GroupsService {
     });
 
     if (groups.length === 0) {
-      return { totalNet: 0, groupCount: 0 };
+      return { totalNet: 0, groupCount: 0, items: [] };
     }
 
     const transactions = await this.prisma.transaction.findMany({
@@ -265,24 +279,46 @@ export class GroupsService {
       },
     });
 
-    let totalNet = 0;
+    const netByGroupId = new Map<string, number>();
+
     for (const transaction of transactions) {
       const amount = Number(transaction.amount);
+      const signedAmount =
+        transaction.direction === TransactionDirection.INCOME
+          ? -amount
+          : amount;
+
       if (transaction.paidByUserId === userId) {
-        totalNet += amount;
+        netByGroupId.set(
+          transaction.groupId!,
+          (netByGroupId.get(transaction.groupId!) ?? 0) + signedAmount,
+        );
       }
 
       const userSplit = transaction.splits.find(
         (split) => split.userId === userId,
       );
       if (userSplit) {
-        totalNet -= amount * (Number(userSplit.percentage) / 100);
+        netByGroupId.set(
+          transaction.groupId!,
+          (netByGroupId.get(transaction.groupId!) ?? 0) -
+            signedAmount * (Number(userSplit.percentage) / 100),
+        );
       }
     }
 
+    const items = groups.map((group) => ({
+      id: group.id,
+      name: group.name,
+      net: this.roundCurrency(netByGroupId.get(group.id) ?? 0),
+    }));
+
     return {
-      totalNet: this.roundCurrency(totalNet),
+      totalNet: this.roundCurrency(
+        items.reduce((sum, group) => sum + group.net, 0),
+      ),
       groupCount: groups.length,
+      items,
     };
   }
 

@@ -3,6 +3,7 @@ import {
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
+import { TransactionDirection } from '@prisma/client';
 import { CoupleService } from './couple.service';
 
 describe('CoupleService', () => {
@@ -115,6 +116,7 @@ describe('CoupleService', () => {
     prisma.transaction.findMany.mockResolvedValue([
       {
         amount: 200,
+        direction: TransactionDirection.EXPENSE,
         paidByUserId: 'user-id',
         splits: [
           { userId: 'user-id', percentage: 50 },
@@ -123,6 +125,7 @@ describe('CoupleService', () => {
       },
       {
         amount: 90,
+        direction: TransactionDirection.EXPENSE,
         paidByUserId: 'partner-id',
         splits: [
           { userId: 'user-id', percentage: 40 },
@@ -142,6 +145,48 @@ describe('CoupleService', () => {
       net: 64,
       youOwe: 0,
       owedToYou: 64,
+    });
+  });
+
+  it('treats shared income as reducing the receiver net balance', async () => {
+    prisma.coupleLinkMember.findUnique.mockResolvedValue({
+      coupleLink: {
+        id: 'couple-id',
+        members: [
+          {
+            userId: 'user-id',
+            user: { id: 'user-id', email: 'user@example.com' },
+          },
+          {
+            userId: 'partner-id',
+            user: { id: 'partner-id', email: 'partner@example.com' },
+          },
+        ],
+      },
+    });
+    prisma.transaction.findMany.mockResolvedValue([
+      {
+        amount: 100,
+        direction: TransactionDirection.INCOME,
+        paidByUserId: 'user-id',
+        splits: [
+          { userId: 'user-id', percentage: 50 },
+          { userId: 'partner-id', percentage: 50 },
+        ],
+      },
+    ]);
+
+    await expect(service.getBalance('user-id')).resolves.toEqual({
+      partner: { id: 'partner-id', email: 'partner@example.com' },
+      totals: {
+        youPaid: -100,
+        yourShare: -50,
+        partnerPaid: 0,
+        partnerShare: -50,
+      },
+      net: -50,
+      youOwe: 50,
+      owedToYou: 0,
     });
   });
 });

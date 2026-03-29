@@ -1,5 +1,9 @@
 import { BadRequestException } from '@nestjs/common';
-import { Category, TransactionType } from '@prisma/client';
+import {
+  Category,
+  TransactionDirection,
+  TransactionType,
+} from '@prisma/client';
 import { TransactionsService } from './transactions.service';
 
 describe('TransactionsService', () => {
@@ -7,6 +11,7 @@ describe('TransactionsService', () => {
     transaction: {
       create: jest.fn(),
       findMany: jest.fn(),
+      count: jest.fn(),
     },
   };
 
@@ -38,6 +43,7 @@ describe('TransactionsService', () => {
       amount: 1200,
       category: Category.HOUSING,
       type: TransactionType.PERSONAL,
+      direction: TransactionDirection.EXPENSE,
       date: new Date('2026-03-26T00:00:00.000Z'),
       createdAt: new Date('2026-03-26T00:00:00.000Z'),
       updatedAt: new Date('2026-03-26T00:00:00.000Z'),
@@ -55,9 +61,11 @@ describe('TransactionsService', () => {
         category: Category.HOUSING,
         date: '2026-03-26',
         type: TransactionType.PERSONAL,
+        direction: TransactionDirection.EXPENSE,
       }),
     ).resolves.toMatchObject({
       type: TransactionType.PERSONAL,
+      direction: TransactionDirection.EXPENSE,
       paidByUserId: 'user-id',
       group: null,
       splits: [],
@@ -72,6 +80,7 @@ describe('TransactionsService', () => {
         category: Category.HOUSING,
         date: '2026-03-26',
         type: TransactionType.PERSONAL,
+        direction: TransactionDirection.EXPENSE,
         paidByUserId: 'user-id',
       }),
     ).rejects.toBeInstanceOf(BadRequestException);
@@ -88,6 +97,7 @@ describe('TransactionsService', () => {
       amount: 200,
       category: Category.FOOD,
       type: TransactionType.COUPLE,
+      direction: TransactionDirection.EXPENSE,
       date: new Date('2026-03-26T00:00:00.000Z'),
       createdAt: new Date('2026-03-26T00:00:00.000Z'),
       updatedAt: new Date('2026-03-26T00:00:00.000Z'),
@@ -108,10 +118,12 @@ describe('TransactionsService', () => {
         category: Category.FOOD,
         date: '2026-03-26',
         type: TransactionType.COUPLE,
+        direction: TransactionDirection.EXPENSE,
         paidByUserId: 'user-id',
       }),
     ).resolves.toMatchObject({
       type: TransactionType.COUPLE,
+      direction: TransactionDirection.EXPENSE,
       couple: { id: 'couple-id' },
       group: null,
     });
@@ -130,6 +142,7 @@ describe('TransactionsService', () => {
         category: Category.UTILITIES,
         date: '2026-03-26',
         type: TransactionType.COUPLE,
+        direction: TransactionDirection.EXPENSE,
         paidByUserId: 'partner-id',
         splits: [
           { userId: 'user-id', percentage: 40 },
@@ -154,6 +167,7 @@ describe('TransactionsService', () => {
       amount: 90,
       category: Category.TRANSPORT,
       type: TransactionType.GROUP,
+      direction: TransactionDirection.EXPENSE,
       date: new Date('2026-03-26T00:00:00.000Z'),
       createdAt: new Date('2026-03-26T00:00:00.000Z'),
       updatedAt: new Date('2026-03-26T00:00:00.000Z'),
@@ -175,11 +189,13 @@ describe('TransactionsService', () => {
         category: Category.TRANSPORT,
         date: '2026-03-26',
         type: TransactionType.GROUP,
+        direction: TransactionDirection.EXPENSE,
         groupId: 'group-id',
         paidByUserId: 'user-a',
       }),
     ).resolves.toMatchObject({
       type: TransactionType.GROUP,
+      direction: TransactionDirection.EXPENSE,
       group: { id: 'group-id', name: 'Trip' },
     });
   });
@@ -192,6 +208,7 @@ describe('TransactionsService', () => {
         category: Category.TRANSPORT,
         date: '2026-03-26',
         type: TransactionType.GROUP,
+        direction: TransactionDirection.EXPENSE,
         groupId: 'group-id',
         paidByUserId: 'user-a',
         participantUserIds: ['user-a', 'user-b'],
@@ -213,6 +230,7 @@ describe('TransactionsService', () => {
         amount: 1200,
         category: Category.HOUSING,
         type: TransactionType.PERSONAL,
+        direction: TransactionDirection.EXPENSE,
         date: new Date('2026-03-26T00:00:00.000Z'),
         createdAt: new Date('2026-03-26T00:00:00.000Z'),
         updatedAt: new Date('2026-03-26T00:00:00.000Z'),
@@ -229,10 +247,90 @@ describe('TransactionsService', () => {
     expect(prisma.transaction.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: {
-          OR: [
-            { creatorUserId: 'user-id', type: TransactionType.PERSONAL },
-            { coupleLinkId: 'couple-id', type: TransactionType.COUPLE },
-            { groupId: { in: ['group-id'] }, type: TransactionType.GROUP },
+          AND: [
+            {
+              OR: [
+                { creatorUserId: 'user-id', type: TransactionType.PERSONAL },
+                { coupleLinkId: 'couple-id', type: TransactionType.COUPLE },
+                { groupId: { in: ['group-id'] }, type: TransactionType.GROUP },
+              ],
+            },
+          ],
+        },
+      }),
+    );
+  });
+
+  it('lists accessible transactions with filters and pagination metadata', async () => {
+    coupleService.findCoupleSummary.mockResolvedValue({ id: 'couple-id' });
+    groupsService.listForUser.mockResolvedValue([
+      { id: 'group-id', name: 'Trip' },
+    ]);
+    prisma.transaction.findMany.mockResolvedValue([
+      {
+        id: 'tx-1',
+        name: 'Salary',
+        amount: 5000,
+        category: Category.OTHER,
+        type: TransactionType.PERSONAL,
+        direction: TransactionDirection.INCOME,
+        date: new Date('2026-03-26T00:00:00.000Z'),
+        createdAt: new Date('2026-03-26T00:00:00.000Z'),
+        updatedAt: new Date('2026-03-26T00:00:00.000Z'),
+        creatorUserId: 'user-id',
+        paidByUserId: 'user-id',
+        coupleLinkId: null,
+        group: null,
+        splits: [],
+      },
+    ]);
+    prisma.transaction.count.mockResolvedValue(1);
+
+    const result = await service.listAccessibleByUser('user-id', {
+      search: 'sal',
+      dateFrom: '2026-03-01',
+      dateTo: '2026-03-31',
+      page: 2,
+      pageSize: 5,
+    });
+
+    expect(result).toEqual({
+      items: [
+        expect.objectContaining({
+          id: 'tx-1',
+          direction: TransactionDirection.INCOME,
+        }),
+      ],
+      page: 2,
+      pageSize: 5,
+      totalItems: 1,
+      totalPages: 1,
+    });
+    expect(prisma.transaction.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 5,
+        take: 5,
+        where: {
+          AND: [
+            {
+              name: {
+                contains: 'sal',
+                mode: 'insensitive',
+              },
+            },
+            {
+              date: {
+                gte: new Date('2026-03-01'),
+                lte: new Date('2026-03-31T23:59:59.999Z'),
+              },
+            },
+            {
+              OR: [
+                { creatorUserId: 'user-id', type: TransactionType.PERSONAL },
+                { coupleLinkId: 'couple-id', type: TransactionType.COUPLE },
+                { groupId: { in: ['group-id'] }, type: TransactionType.GROUP },
+              ],
+            },
           ],
         },
       }),

@@ -65,6 +65,16 @@
   color: var(--ds-colors-primary-500);
 }
 
+.nav-item--disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.nav-item--disabled:hover {
+  background-color: transparent;
+  color: var(--ds-colors-text-secondary);
+}
+
 .nav-item--active {
   color: var(--ds-colors-primary-600);
   background-color: var(--ds-colors-primary-50);
@@ -124,6 +134,12 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.user-avatar-fallback {
+  font-size: var(--ds-typography-fontSize-14);
+  font-weight: var(--ds-typography-fontWeight-bold);
+  color: var(--ds-colors-text-brandStrong);
 }
 
 .search-icon {
@@ -278,6 +294,14 @@
   letter-spacing: -0.02em;
 }
 
+.main-balance.danger {
+  color: var(--ds-colors-text-dangerStrong);
+}
+
+.main-balance.success {
+  color: var(--ds-colors-text-brandStrong);
+}
+
 .balance-header {
   margin-bottom: var(--ds-spacing-6);
 }
@@ -426,12 +450,22 @@
   font-weight: var(--ds-typography-fontWeight-bold);
 }
 
+.transaction-amount-block {
+  text-align: right;
+}
+
 .transaction-amount.danger {
   color: var(--ds-colors-text-dangerStrong);
 }
 
 .transaction-amount.success {
   color: var(--ds-colors-text-successStrong);
+}
+
+.transaction-source {
+  margin: var(--ds-spacing-1) 0 0;
+  font-size: var(--ds-typography-fontSize-12);
+  color: var(--ds-colors-text-muted);
 }
 
 .view-all {
@@ -463,6 +497,13 @@
   gap: var(--ds-spacing-4);
 }
 
+.group-summary {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--ds-spacing-1);
+}
+
 .group-avatar,
 .group-avatar-icon {
   width: var(--ds-size-avatar-group);
@@ -492,7 +533,12 @@
   font-size: var(--ds-typography-fontSize-18);
   font-weight: var(--ds-typography-fontWeight-bold);
   margin: 0;
-  text-align: right;
+}
+
+.group-meta {
+  margin: 0;
+  color: var(--ds-colors-text-muted);
+  font-size: var(--ds-typography-fontSize-13);
 }
 
 .group-amount.danger {
@@ -514,6 +560,11 @@
   height: 100vh;
   font-family: var(--ds-typography-fontFamily-primary);
   color: var(--ds-colors-text-secondary);
+}
+
+.empty-card {
+  color: var(--ds-colors-text-secondary);
+  text-align: center;
 }
 
 .auth-landing {

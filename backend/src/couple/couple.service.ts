@@ -4,7 +4,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CoupleLink, TransactionType, User } from '@prisma/client';
+import {
+  CoupleLink,
+  TransactionDirection,
+  TransactionType,
+  User,
+} from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from '../users/users.service';
 
@@ -138,15 +143,20 @@ export class CoupleService {
 
     for (const transaction of transactions) {
       const amount = Number(transaction.amount);
+      const signedAmount =
+        transaction.direction === TransactionDirection.INCOME
+          ? -amount
+          : amount;
+
       if (transaction.paidByUserId === userId) {
-        youPaid += amount;
+        youPaid += signedAmount;
       }
       if (transaction.paidByUserId === partner.id) {
-        partnerPaid += amount;
+        partnerPaid += signedAmount;
       }
 
       for (const split of transaction.splits) {
-        const share = amount * (Number(split.percentage) / 100);
+        const share = signedAmount * (Number(split.percentage) / 100);
         if (split.userId === userId) {
           yourShare += share;
         }

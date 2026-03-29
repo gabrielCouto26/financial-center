@@ -20,6 +20,7 @@ Atualmente, o projeto concluiu a fundação de infraestrutura, autenticação, t
 - **O que foi feito**: Modelagem e implementação de transações Pessoais, de Casal (com split configurável) e de Grupo (com acertos/settlements). Endpoints de balanço e resumo agregados.
 - **Arquivos principais**: `backend/src/transactions/`, `backend/src/couple/`, `backend/src/groups/`.
 - **Notas**: O contrato de transações suporta os 3 modos (`PERSONAL`, `COUPLE`, `GROUP`) de forma unificada.
+- **Atualização recente**: `/transactions` agora exige o campo `direction` (INCOME/EXPENSE), oferece pesquisa textual, filtros de data e paginação com metadados. O dashboard (`GET /dashboard`) consome os mesmos dados, inclui a lista detalhada de grupos (`groups.items`) e respeita `direction` nos cálculos e `recentTransactions`.
 
 ### Design System e Redesign do Dashboard (Épico 5)
 - **O que foi feito**: Implementação de tokens de design (Figma), componentes atômicos (`Button`, `Input`, `Card`, `Badge`) e biblioteca de ícones SVG. Redesign total da `HomePage` (Dashboard) e migração da visão anterior para a `PersonalPage`.
@@ -33,16 +34,15 @@ Atualmente, o projeto concluiu a fundação de infraestrutura, autenticação, t
 
 ## Onde o Desenvolvimento Parou
 
-- **Em progresso**: Conexão completa do Dashboard com dados reais do backend (remover mock data restantes) e evolução da `PersonalPage` com dados e interações reais.
+- **Em progresso**: Aperfeiçoar experiências complementares como modais de cadastro e recursos responsivos; o Dashboard já consome `/dashboard` real com novos blocos de grupos e `recentTransactions`.
 - **Próximos passos**:
-  1. Conectar `HomePage` (Dashboard) ao endpoint `GET /dashboard`.
-  2. Implementar modal/página de "Nova Despesa" integrada ao Design System.
-  3. Migrar telas de Autenticação para os novos componentes UI.
-  4. Adicionar relatórios detalhados e gráficos.
+  1. Expandir filtros/páginas de transações com paginação completa.
+  2. Documentar fluxos de `Income` versus `Expense` para os usuários.
+  3. Ativar testes end-to-end para novos componentes (Dashboard e formulário).
 - **Pendências**:
-  - Responsividade (layout focado em Desktop no momento).
+  - Responsividade permanece parcial (foco desktop).
   - Edição/Exclusão de grupos e transações na IU.
-  - Testes e2e automatizados.
+  - Testes e2e automatizados ainda pendentes.
 
 ## Endpoints / APIs (Estado Atual)
 

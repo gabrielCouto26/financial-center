@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { apiFetch, clearStoredToken } from '../../services/api';
 import { Button } from '../../design-system/Button/Button';
 import { Card } from '../../design-system/Card/Card';
@@ -35,7 +35,7 @@ type Props = {
   hasToken: boolean;
 };
 
-const categoryIcons: Record<string, React.ReactNode> = {
+const categoryIcons = {
   [Category.HOUSING]: <IconHome size={16} />,
   [Category.FOOD]: <IconUtensils size={16} />,
   [Category.TRANSPORT]: <IconBus size={16} />,
@@ -45,9 +45,9 @@ const categoryIcons: Record<string, React.ReactNode> = {
   [Category.EDUCATION]: <IconLightbulb size={16} />,
   [Category.UTILITIES]: <IconSettings size={16} />,
   [Category.OTHER]: <IconDashboard size={16} />,
-};
+} satisfies Record<Category, React.ReactNode>;
 
-const categoryLabels: Record<Category, string> = {
+const categoryLabels = {
   [Category.FOOD]: 'Alimentação',
   [Category.TRANSPORT]: 'Transporte',
   [Category.HOUSING]: 'Moradia',
@@ -57,16 +57,33 @@ const categoryLabels: Record<Category, string> = {
   [Category.EDUCATION]: 'Educação',
   [Category.UTILITIES]: 'Serviços',
   [Category.OTHER]: 'Outros',
-};
+} satisfies Record<Category, string>;
+
+const categoryAccentClasses = {
+  [Category.HOUSING]: { bg: 'bg-blue-light', bar: 'bar-blue' },
+  [Category.FOOD]: { bg: 'bg-green-light', bar: 'bar-green' },
+  [Category.TRANSPORT]: { bg: 'bg-red-light', bar: 'bar-red' },
+  [Category.ENTERTAINMENT]: { bg: 'bg-blue-light', bar: 'bar-blue' },
+  [Category.HEALTH]: { bg: 'bg-green-light', bar: 'bar-green' },
+  [Category.SHOPPING]: { bg: 'bg-red-light', bar: 'bar-red' },
+  [Category.EDUCATION]: { bg: 'bg-blue-light', bar: 'bar-blue' },
+  [Category.UTILITIES]: { bg: 'bg-green-light', bar: 'bar-green' },
+  [Category.OTHER]: { bg: 'bg-red-light', bar: 'bar-red' },
+} satisfies Record<Category, { bg: string; bar: string }>;
 
 export function PersonalPage({ user, isLoading, hasToken }: Props) {
+  const location = useLocation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { data: dashboard, isLoading: isDashboardLoading } = useQuery({
+  const { data: dashboard, isLoading: isDashboardLoading, isError } = useQuery({
     queryKey: ['dashboard', user?.id],
     queryFn: () => apiFetch<DashboardData>('/dashboard'),
     enabled: Boolean(user?.id),
   });
+
+  function getNavItemClass(path: string) {
+    return `nav-item ${location.pathname === path ? 'nav-item--active' : ''}`;
+  }
 
   function logout() {
     clearStoredToken();
@@ -74,51 +91,100 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
     navigate('/', { replace: true });
   }
 
+  function formatCurrency(value: number, maximumFractionDigits = 2): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      maximumFractionDigits,
+    }).format(value);
+  }
+
+  function formatMonth(monthKey: string): string {
+    const [year, month] = monthKey.split('-');
+    const parsedYear = Number.parseInt(year, 10);
+    const parsedMonth = Number.parseInt(month, 10);
+    if (
+      Number.isNaN(parsedYear) ||
+      Number.isNaN(parsedMonth) ||
+      parsedMonth < 1 ||
+      parsedMonth > 12
+    ) {
+      return monthKey;
+    }
+
+    return new Date(parsedYear, parsedMonth - 1, 1).toLocaleDateString(
+      'en-US',
+      {
+        month: 'long',
+        year: 'numeric',
+      },
+    );
+  }
+
+  function formatTransactionDate(value: string): string {
+    return new Date(value).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  }
+
+  function getComparisonBadge() {
+    if (!dashboard) {
+      return { text: '', variant: 'neutral' as const };
+    }
+
+    const percentage = dashboard.personal.monthOverMonthPercentage;
+    if (percentage === null) {
+      return {
+        text: 'No previous-month baseline',
+        variant: 'neutral' as const,
+      };
+    }
+
+    if (percentage <= 0) {
+      return {
+        text: `VS LAST MONTH ${percentage.toFixed(2)}%`,
+        variant: 'success' as const,
+      };
+    }
+
+    return {
+      text: `VS LAST MONTH +${percentage.toFixed(2)}%`,
+      variant: 'warning' as const,
+    };
+  }
+
+  function getTransactionSourceLabel(type: TransactionType): string {
+    switch (type) {
+      case TransactionType.COUPLE:
+        return 'Couple Account';
+      case TransactionType.GROUP:
+        return 'Group Split';
+      default:
+        return 'Personal Wallet';
+    }
+  }
+
   if (hasToken && isLoading) {
     return <div className="loading-state">Loading session…</div>;
   }
 
   if (hasToken && user) {
-    if (isDashboardLoading || !dashboard) {
+    if (isDashboardLoading) {
       return <div className="loading-state">Loading personal data…</div>;
     }
 
-    const formattedBalance = new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(dashboard.summary.totalSpentThisMonth);
+    if (isError || !dashboard) {
+      return <div className="loading-state">Unable to load personal data.</div>;
+    }
 
-    const [year, month] = (dashboard.period?.month || "2023-10").split('-');
-    const monthName = new Date(parseInt(year), parseInt(month) - 1).toLocaleDateString('en-US', { month: 'long' });
-    const fullDateLabel = `Total spent in ${monthName} ${year}`;
-
-    // Mock category breakdown for fidelity if not provided by backend
-    const categories = [
-      {
-        label: 'Moradia',
-        amount: 2100,
-        percentage: 49,
-        icon: <IconHome size={16} />,
-        bg: 'bg-blue-light',
-        bar: 'bar-blue',
-      },
-      {
-        label: 'Alimentação',
-        amount: 840,
-        percentage: 35,
-        icon: <IconUtensils size={16} />,
-        bg: 'bg-green-light',
-        bar: 'bar-green',
-      },
-      {
-        label: 'Transporte',
-        amount: 450.2,
-        percentage: 20,
-        icon: <IconBus size={16} />,
-        bg: 'bg-red-light',
-        bar: 'bar-red',
-      },
-    ];
+    const userInitial = user.email.slice(0, 1).toUpperCase();
+    const comparisonBadge = getComparisonBadge();
+    const secondaryHighlights = dashboard.personal.secondaryHighlights;
+    const personalRecentTransactions = dashboard.recentTransactions.filter(
+      (transaction) => transaction.type === TransactionType.PERSONAL,
+    );
 
     return (
       <div className="personal-page">
@@ -128,22 +194,22 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
           </div>
 
           <nav className="sidebar-nav">
-            <Link to="/" className="nav-item">
+            <Link to="/" className={getNavItemClass('/')}>
               <IconDashboard size={20} />
               Dashboard
             </Link>
-            <Link to="/" className="nav-item nav-item--active">
+            <Link to="/personal" className={getNavItemClass('/personal')}>
               <IconUser size={20} />
               Personal
             </Link>
-            <Link to="/" className="nav-item">
+            <span className="nav-item nav-item--disabled" aria-disabled="true">
               <IconHeart size={20} />
               Couple
-            </Link>
-            <Link to="/" className="nav-item">
+            </span>
+            <span className="nav-item nav-item--disabled" aria-disabled="true">
               <IconUsers size={20} />
               Groups
-            </Link>
+            </span>
           </nav>
 
           <div className="sidebar-footer">
@@ -152,6 +218,8 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
               size="md"
               icon={<IconPlus size={16} />}
               className="w-full"
+              disabled
+              title="Transaction creation is not available on this screen yet."
             >
               New Expense
             </Button>
@@ -164,15 +232,26 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
               <IconSearch size={18} className="search-icon" />
               <Input
                 variant="underlined"
-                placeholder="Search transactions..."
+                placeholder="Search is unavailable on this page"
                 className="search-input"
+                disabled
               />
             </div>
             <div className="header-actions">
               <IconBell size={20} className="action-icon" />
               <IconSettings size={20} className="action-icon" />
-              <div className="user-profile" onClick={logout}>
-                <IconUser size={24} />
+              <div
+                className="user-profile"
+                onClick={logout}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    logout();
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+              >
+                <span className="user-avatar-fallback">{userInitial}</span>
               </div>
             </div>
           </header>
@@ -181,55 +260,68 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
             <section className="hero-section">
               <div>
                 <p className="hero-title">Personal Statement</p>
-                <h1 className="hero-balance">{formattedBalance}</h1>
-                <p className="hero-subtitle">{fullDateLabel}</p>
+                <h1 className="hero-balance">
+                  {formatCurrency(dashboard.personal.currentMonthTotal)}
+                </h1>
+                <p className="hero-subtitle">
+                  Total spent in {formatMonth(dashboard.period.month)}
+                </p>
               </div>
-              <Badge variant="success" pill>
-                VS LAST MONTH ~ 12.5%
+              <Badge variant={comparisonBadge.variant} pill>
+                {comparisonBadge.text}
               </Badge>
             </section>
 
             <section className="summary-grid">
-              {categories.map((cat, i) => (
-                <Card key={i} className="summary-card">
-                  <div className="summary-card-header">
-                    <div className={`icon-circle ${cat.bg}`}>
-                      {cat.icon}
-                    </div>
-                    <span className="summary-card-amount">
-                      {new Intl.NumberFormat('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL',
-                        maximumFractionDigits: 0,
-                      }).format(cat.amount)}
-                    </span>
-                  </div>
-                  <div className="summary-card-footer">
-                    <p className="summary-card-label">{cat.label}</p>
-                    <div className="progress-container">
-                      <div
-                        className={`progress-bar ${cat.bar}`}
-                        style={{ width: `${cat.percentage}%` }}
-                      />
-                    </div>
-                    <span className="summary-card-subtext">
-                      {cat.percentage}% of budget
-                    </span>
-                  </div>
+              {dashboard.personal.categoryBreakdown.length > 0 ? (
+                dashboard.personal.categoryBreakdown.map((categoryItem) => {
+                  const accent = categoryAccentClasses[categoryItem.category];
+                  return (
+                    <Card key={categoryItem.category} className="summary-card">
+                      <div className="summary-card-header">
+                        <div className={`icon-circle ${accent.bg}`}>
+                          {categoryIcons[categoryItem.category]}
+                        </div>
+                        <span className="summary-card-amount">
+                          {formatCurrency(categoryItem.amount, 0)}
+                        </span>
+                      </div>
+                      <div className="summary-card-footer">
+                        <p className="summary-card-label">
+                          {categoryLabels[categoryItem.category]}
+                        </p>
+                        <div className="progress-container">
+                          <div
+                            className={`progress-bar ${accent.bar}`}
+                            style={{
+                              width: `${Math.min(categoryItem.percentage, 100)}%`,
+                            }}
+                          />
+                        </div>
+                        <span className="summary-card-subtext">
+                          {categoryItem.percentage.toFixed(2)}% of budget
+                        </span>
+                      </div>
+                    </Card>
+                  );
+                })
+              ) : (
+                <Card className="summary-empty-card">
+                  No personal category activity found for this month.
                 </Card>
-              ))}
+              )}
             </section>
 
             <section className="secondary-summary">
               <div className="secondary-items">
-                <div className="secondary-item">
-                  <span className="secondary-item-label">Lazer</span>
-                  <span className="secondary-item-value">R$ 620,00</span>
-                </div>
-                <div className="secondary-item">
-                  <span className="secondary-item-label">Outros</span>
-                  <span className="secondary-item-value">R$ 270,30</span>
-                </div>
+                {secondaryHighlights.map((highlight) => (
+                  <div key={highlight.label} className="secondary-item">
+                    <span className="secondary-item-label">{highlight.label}</span>
+                    <span className="secondary-item-value">
+                      {formatCurrency(highlight.amount)}
+                    </span>
+                  </div>
+                ))}
               </div>
               <div className="avatar-stack">
                 <div className="avatar bg-blue-light" />
@@ -242,57 +334,66 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
               <div className="section-header">
                 <h2 className="section-title">Recent Activity</h2>
                 <div className="section-actions">
-                  <Button variant="secondary" size="sm" icon={<IconFilter size={14} />}>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    icon={<IconFilter size={14} />}
+                    disabled
+                    title="Filtering is not available on this page yet."
+                  >
                     Filter
                   </Button>
-                  <Button variant="secondary" size="sm" icon={<IconCalendar size={14} />}>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    icon={<IconCalendar size={14} />}
+                    disabled
+                    title="Date filtering is not available on this page yet."
+                  >
                     Date
                   </Button>
                 </div>
               </div>
 
               <div className="activity-list">
-                {dashboard.recentTransactions.map((tx) => (
-                  <div key={tx.id} className="activity-item">
-                    <div className="activity-icon">
-                      {categoryIcons[tx.category] || <IconDashboard size={20} />}
-                    </div>
-                    <div className="activity-content">
-                      <p className="activity-name">{tx.name}</p>
-                      <div className="activity-meta">
-                        <span className="activity-date">
-                          {new Date(tx.date).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                          })}
-                        </span>
-                        <Badge variant="success" pill>
-                          {categoryLabels[tx.category]}
-                        </Badge>
+                {personalRecentTransactions.length > 0 ? (
+                  personalRecentTransactions.map((tx) => (
+                    <div key={tx.id} className="activity-item">
+                      <div className="activity-icon">
+                        {categoryIcons[tx.category] || <IconDashboard size={20} />}
+                      </div>
+                      <div className="activity-content">
+                        <p className="activity-name">{tx.name}</p>
+                        <div className="activity-meta">
+                          <span className="activity-date">
+                            {formatTransactionDate(tx.date)}
+                          </span>
+                          <Badge variant="success" pill>
+                            {categoryLabels[tx.category]}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="activity-amount-group">
+                        <p className="activity-amount">
+                          - {formatCurrency(Number(tx.amount))}
+                        </p>
+                        <p className="activity-source">
+                          {getTransactionSourceLabel(tx.type)}
+                        </p>
                       </div>
                     </div>
-                    <div className="activity-amount-group">
-                      <p className="activity-amount">
-                        - {new Intl.NumberFormat('pt-BR', {
-                          style: 'currency',
-                          currency: 'BRL',
-                        }).format(Number(tx.amount))}
-                      </p>
-                      <p className="activity-source">
-                        {tx.type === TransactionType.PERSONAL
-                          ? 'Personal Wallet'
-                          : tx.type === TransactionType.COUPLE
-                            ? 'Couple Account'
-                            : 'Group Split'}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <Card className="summary-empty-card">
+                    No personal activity found for this user.
+                  </Card>
+                )}
               </div>
 
               <div className="load-more">
-                <button className="load-more-btn">Load More Transactions</button>
+                <button className="load-more-btn" disabled>
+                  Load More Transactions
+                </button>
               </div>
             </section>
           </div>

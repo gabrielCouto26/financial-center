@@ -4,6 +4,7 @@ import type { CoupleSummary } from "../../types/couple";
 import type { GroupSummary } from "../../types/group";
 import {
   Category,
+  type PaginatedTransactions,
   type Transaction,
   TransactionType,
 } from "../../types/transaction";
@@ -15,7 +16,7 @@ type Props = {
 export function TransactionList({ currentUserId }: Props) {
   const { data: transactions, isLoading } = useQuery({
     queryKey: ["transactions", currentUserId],
-    queryFn: () => apiFetch<Transaction[]>("/transactions"),
+    queryFn: () => apiFetch<PaginatedTransactions>("/transactions"),
   });
   const { data: couple } = useQuery({
     queryKey: ["couple", currentUserId],
@@ -74,7 +75,7 @@ export function TransactionList({ currentUserId }: Props) {
     return <p>Loading transactions…</p>;
   }
 
-  if (!transactions || transactions.length === 0) {
+  if (!transactions || transactions.items.length === 0) {
     return <p>No transactions yet.</p>;
   }
 
@@ -93,7 +94,7 @@ export function TransactionList({ currentUserId }: Props) {
           </tr>
         </thead>
         <tbody>
-          {transactions.map((transaction) => (
+          {transactions.items.map((transaction) => (
             <tr key={transaction.id}>
               <td>{new Date(transaction.date).toLocaleDateString()}</td>
               <td>{transaction.name}</td>

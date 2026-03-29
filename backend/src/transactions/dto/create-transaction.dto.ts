@@ -12,9 +12,13 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { Category, TransactionType } from '@prisma/client';
+import {
+  Category,
+  TransactionDirection,
+  TransactionType,
+} from '@prisma/client';
 
-export { Category, TransactionType };
+export { Category, TransactionDirection, TransactionType };
 
 export class CreateTransactionSplitDto {
   @IsUUID()
@@ -42,6 +46,9 @@ export class CreateTransactionDto {
 
   @IsEnum(TransactionType)
   type!: TransactionType;
+
+  @IsEnum(TransactionDirection)
+  direction!: TransactionDirection;
 
   @IsOptional()
   @IsUUID()

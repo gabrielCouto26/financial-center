@@ -9,6 +9,7 @@ import type { GroupDetail, GroupSummary } from "../../types/group";
 import {
   Category,
   type CreateTransactionRequest,
+  TransactionDirection,
   type Transaction,
   TransactionType,
 } from "../../types/transaction";
@@ -25,6 +26,7 @@ const schema = z
     category: z.nativeEnum(Category),
     date: z.string().min(1, "Date is required"),
     type: z.nativeEnum(TransactionType),
+    direction: z.nativeEnum(TransactionDirection),
     paidByUserId: z.string().optional(),
     groupId: z.string().optional(),
     participantUserIds: z.array(z.string()).optional(),
@@ -129,6 +131,7 @@ export function TransactionForm({ currentUserId }: Props) {
     resolver: zodResolver(schema),
     defaultValues: {
       date: new Date().toISOString().split("T")[0],
+      direction: TransactionDirection.EXPENSE,
       type: TransactionType.PERSONAL,
     },
   });
@@ -225,6 +228,7 @@ export function TransactionForm({ currentUserId }: Props) {
       }
       reset({
         date: new Date().toISOString().split("T")[0],
+        direction: TransactionDirection.EXPENSE,
         type: TransactionType.PERSONAL,
       });
     },
@@ -238,6 +242,7 @@ export function TransactionForm({ currentUserId }: Props) {
         category: values.category,
         date: values.date,
         type: TransactionType.PERSONAL,
+        direction: values.direction,
       };
     }
 
@@ -248,6 +253,7 @@ export function TransactionForm({ currentUserId }: Props) {
         category: values.category,
         date: values.date,
         type: TransactionType.COUPLE,
+        direction: values.direction,
         paidByUserId: values.paidByUserId,
         splits: values.splits,
       };
@@ -259,6 +265,7 @@ export function TransactionForm({ currentUserId }: Props) {
       category: values.category,
       date: values.date,
       type: TransactionType.GROUP,
+      direction: values.direction,
       groupId: values.groupId,
       paidByUserId: values.paidByUserId,
       participantUserIds: values.participantUserIds?.length
@@ -377,6 +384,14 @@ export function TransactionForm({ currentUserId }: Props) {
           <option value={TransactionType.GROUP} disabled={!groups?.length}>
             Group
           </option>
+        </select>
+      </label>
+
+      <label>
+        Direction
+        <select {...register("direction")}>
+          <option value={TransactionDirection.EXPENSE}>Expense</option>
+          <option value={TransactionDirection.INCOME}>Income</option>
         </select>
       </label>
 

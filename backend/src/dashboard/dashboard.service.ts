@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { TransactionType } from '@prisma/client';
+import {
+  Category,
+  TransactionDirection,
+  TransactionType,
+} from '@prisma/client';
 import {
   CoupleDashboardSummary,
   CoupleService,
@@ -20,8 +24,24 @@ export type DashboardResponse = {
   };
   couple: CoupleDashboardSummary;
   groups: GroupDashboardSummary;
+  personal: {
+    currentMonthTotal: number;
+    previousMonthTotal: number;
+    monthOverMonthPercentage: number | null;
+    categoryBreakdown: Array<{
+      category: Category;
+      amount: number;
+      percentage: number;
+    }>;
+    secondaryHighlights: Array<{
+      label: string;
+      amount: number;
+    }>;
+  };
   recentTransactions: TransactionResponse[];
 };
+
+type PersonalDashboardSummary = DashboardResponse['personal'];
 
 @Injectable()
 export class DashboardService {
@@ -38,7 +58,7 @@ export class DashboardService {
       this.transactionsService.findRecentAccessibleByUser(userId, 10),
     ]);
 
-    const { totalSpentThisMonth, personalNet } =
+    const { totalSpentThisMonth, personalNet, personal } =
       await this.getPersonalAndMonthlyMetrics(userId);
 
     return {
@@ -53,6 +73,7 @@ export class DashboardService {
       },
       couple,
       groups,
+      personal,
       recentTransactions,
     };
   }
@@ -60,27 +81,56 @@ export class DashboardService {
   private async getPersonalAndMonthlyMetrics(userId: string): Promise<{
     totalSpentThisMonth: number;
     personalNet: number;
+    personal: PersonalDashboardSummary;
   }> {
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const previousMonthStart = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      1,
+    );
 
     const accessibleTransactions =
       await this.transactionsService.findAllAccessibleByUser(userId);
 
     let totalSpentThisMonth = 0;
     let personalNet = 0;
+    let currentMonthPersonalTotal = 0;
+    let previousMonthPersonalTotal = 0;
+    const categoryTotals = new Map<Category, number>();
 
     for (const transaction of accessibleTransactions) {
       const amount = Number(transaction.amount);
+      const transactionDate = new Date(transaction.date);
       const isThisMonth =
-        new Date(transaction.date) >= monthStart &&
-        new Date(transaction.date) < nextMonthStart;
+        transactionDate >= monthStart && transactionDate < nextMonthStart;
+      const isPreviousMonth =
+        transactionDate >= previousMonthStart && transactionDate < monthStart;
 
       if (transaction.type === TransactionType.PERSONAL) {
-        personalNet -= amount;
+        const signedAmount =
+          transaction.direction === TransactionDirection.INCOME
+            ? amount
+            : -amount;
+
+        personalNet += signedAmount;
         if (isThisMonth) {
-          totalSpentThisMonth += amount;
+          if (transaction.direction === TransactionDirection.EXPENSE) {
+            totalSpentThisMonth += amount;
+            currentMonthPersonalTotal += amount;
+            categoryTotals.set(
+              transaction.category,
+              (categoryTotals.get(transaction.category) ?? 0) + amount,
+            );
+          }
+        }
+        if (
+          isPreviousMonth &&
+          transaction.direction === TransactionDirection.EXPENSE
+        ) {
+          previousMonthPersonalTotal += amount;
         }
         continue;
       }
@@ -93,14 +143,63 @@ export class DashboardService {
       }
 
       const share = amount * (Number(userSplit.percentage) / 100);
-      if (isThisMonth) {
+      if (
+        isThisMonth &&
+        transaction.direction === TransactionDirection.EXPENSE
+      ) {
         totalSpentThisMonth += share;
       }
     }
 
+    const roundedCurrentMonthPersonalTotal = this.roundCurrency(
+      currentMonthPersonalTotal,
+    );
+    const roundedPreviousMonthPersonalTotal = this.roundCurrency(
+      previousMonthPersonalTotal,
+    );
+    const categoryBreakdown = [...categoryTotals.entries()]
+      .map(([category, total]) => ({
+        category,
+        amount: this.roundCurrency(total),
+        percentage:
+          roundedCurrentMonthPersonalTotal === 0
+            ? 0
+            : this.roundPercentage(
+                (this.roundCurrency(total) / roundedCurrentMonthPersonalTotal) *
+                  100,
+              ),
+      }))
+      .sort((left, right) => right.amount - left.amount);
+
     return {
       totalSpentThisMonth: this.roundCurrency(totalSpentThisMonth),
       personalNet: this.roundCurrency(personalNet),
+      personal: {
+        currentMonthTotal: roundedCurrentMonthPersonalTotal,
+        previousMonthTotal: roundedPreviousMonthPersonalTotal,
+        monthOverMonthPercentage:
+          roundedPreviousMonthPersonalTotal === 0
+            ? null
+            : this.roundPercentage(
+                ((roundedCurrentMonthPersonalTotal -
+                  roundedPreviousMonthPersonalTotal) /
+                  roundedPreviousMonthPersonalTotal) *
+                  100,
+              ),
+        categoryBreakdown,
+        secondaryHighlights: [
+          {
+            label: 'Lazer',
+            amount: this.roundCurrency(
+              categoryTotals.get(Category.ENTERTAINMENT) ?? 0,
+            ),
+          },
+          {
+            label: 'Outros',
+            amount: this.roundCurrency(categoryTotals.get(Category.OTHER) ?? 0),
+          },
+        ],
+      },
     };
   }
 
@@ -111,6 +210,10 @@ export class DashboardService {
   }
 
   private roundCurrency(value: number): number {
+    return Math.round((value + Number.EPSILON) * 100) / 100;
+  }
+
+  private roundPercentage(value: number): number {
     return Math.round((value + Number.EPSILON) * 100) / 100;
   }
 }

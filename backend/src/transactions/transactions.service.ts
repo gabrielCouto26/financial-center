@@ -1,5 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Category, Prisma, TransactionType } from '@prisma/client';
+import {
+  Category,
+  Prisma,
+  TransactionDirection,
+  TransactionType,
+} from '@prisma/client';
 import { CoupleService } from '../couple/couple.service';
 import { GroupsService } from '../groups/groups.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -7,6 +12,7 @@ import {
   CreateTransactionDto,
   CreateTransactionSplitDto,
 } from './dto/create-transaction.dto';
+import { ListTransactionsQueryDto } from './dto/list-transactions-query.dto';
 
 type TransactionRecord = Prisma.TransactionGetPayload<{
   include: {
@@ -26,6 +32,7 @@ export type TransactionResponse = {
   amount: number;
   category: Category;
   type: TransactionType;
+  direction: TransactionDirection;
   date: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -34,6 +41,14 @@ export type TransactionResponse = {
   couple: { id: string } | null;
   group: { id: string; name: string } | null;
   splits: TransactionSplitResponse[];
+};
+
+export type PaginatedTransactionsResponse = {
+  items: TransactionResponse[];
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
 };
 
 @Injectable()
@@ -67,6 +82,39 @@ export class TransactionsService {
     return transactions.map((transaction) => this.mapToResponse(transaction));
   }
 
+  async listAccessibleByUser(
+    userId: string,
+    query: ListTransactionsQueryDto,
+  ): Promise<PaginatedTransactionsResponse> {
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? 20;
+    const where = await this.buildAccessibleWhere(userId, query);
+
+    const [transactions, totalItems] = await Promise.all([
+      this.prisma.transaction.findMany({
+        where,
+        include: {
+          splits: {
+            orderBy: { createdAt: 'asc' },
+          },
+          group: true,
+        },
+        orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      this.prisma.transaction.count({ where }),
+    ]);
+
+    return {
+      items: transactions.map((transaction) => this.mapToResponse(transaction)),
+      page,
+      pageSize,
+      totalItems,
+      totalPages: totalItems === 0 ? 0 : Math.ceil(totalItems / pageSize),
+    };
+  }
+
   async findRecentAccessibleByUser(
     userId: string,
     limit: number,
@@ -79,33 +127,10 @@ export class TransactionsService {
     userId: string,
     limit?: number,
   ): Promise<TransactionRecord[]> {
-    const couple = await this.coupleService.findCoupleSummary(userId);
-    const groups = await this.groupsService.listForUser(userId);
+    const where = await this.buildAccessibleWhere(userId);
+
     return this.prisma.transaction.findMany({
-      where: {
-        OR: [
-          {
-            creatorUserId: userId,
-            type: TransactionType.PERSONAL,
-          },
-          ...(couple
-            ? [
-                {
-                  coupleLinkId: couple.id,
-                  type: TransactionType.COUPLE,
-                },
-              ]
-            : []),
-          ...(groups.length > 0
-            ? [
-                {
-                  groupId: { in: groups.map((group) => group.id) },
-                  type: TransactionType.GROUP,
-                },
-              ]
-            : []),
-        ],
-      },
+      where,
       include: {
         splits: {
           orderBy: { createdAt: 'asc' },
@@ -115,6 +140,67 @@ export class TransactionsService {
       orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
       ...(typeof limit === 'number' ? { take: limit } : {}),
     });
+  }
+
+  private async buildAccessibleWhere(
+    userId: string,
+    query?: Pick<ListTransactionsQueryDto, 'search' | 'dateFrom' | 'dateTo'>,
+  ): Promise<Prisma.TransactionWhereInput> {
+    const couple = await this.coupleService.findCoupleSummary(userId);
+    const groups = await this.groupsService.listForUser(userId);
+    const filters: Prisma.TransactionWhereInput[] = [];
+    const trimmedSearch = query?.search?.trim();
+
+    if (trimmedSearch) {
+      filters.push({
+        name: {
+          contains: trimmedSearch,
+          mode: 'insensitive',
+        },
+      });
+    }
+
+    if (query?.dateFrom || query?.dateTo) {
+      const date: Prisma.DateTimeFilter = {};
+      if (query.dateFrom) {
+        date.gte = new Date(query.dateFrom);
+      }
+      if (query.dateTo) {
+        const inclusiveDateTo = new Date(query.dateTo);
+        inclusiveDateTo.setUTCHours(23, 59, 59, 999);
+        date.lte = inclusiveDateTo;
+      }
+      filters.push({ date });
+    }
+
+    filters.push({
+      OR: [
+        {
+          creatorUserId: userId,
+          type: TransactionType.PERSONAL,
+        },
+        ...(couple
+          ? [
+              {
+                coupleLinkId: couple.id,
+                type: TransactionType.COUPLE,
+              },
+            ]
+          : []),
+        ...(groups.length > 0
+          ? [
+              {
+                groupId: { in: groups.map((group) => group.id) },
+                type: TransactionType.GROUP,
+              },
+            ]
+          : []),
+      ],
+    });
+
+    return {
+      AND: filters,
+    };
   }
 
   private async createPersonal(
@@ -138,6 +224,7 @@ export class TransactionsService {
         amount: dto.amount,
         category: dto.category,
         type: TransactionType.PERSONAL,
+        direction: dto.direction,
         date: new Date(dto.date),
         creatorUserId: userId,
         paidByUserId: userId,
@@ -180,6 +267,7 @@ export class TransactionsService {
         amount: dto.amount,
         category: dto.category,
         type: TransactionType.COUPLE,
+        direction: dto.direction,
         date: new Date(dto.date),
         creatorUserId: userId,
         paidByUserId: dto.paidByUserId,
@@ -240,6 +328,7 @@ export class TransactionsService {
         amount: dto.amount,
         category: dto.category,
         type: TransactionType.GROUP,
+        direction: dto.direction,
         date: new Date(dto.date),
         creatorUserId: userId,
         paidByUserId: dto.paidByUserId,
@@ -368,6 +457,7 @@ export class TransactionsService {
       amount: Number(transaction.amount),
       category: transaction.category,
       type: transaction.type,
+      direction: transaction.direction,
       date: transaction.date,
       createdAt: transaction.createdAt,
       updatedAt: transaction.updatedAt,

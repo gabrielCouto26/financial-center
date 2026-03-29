@@ -36,6 +36,7 @@ npm run start:dev
 - Health: `GET http://localhost:3000/api/health`
 - Auth: `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me` (Bearer JWT)
 - Transactions: `POST /api/transactions` (create), `GET /api/transactions` (list) — requires Bearer JWT
+- Transactions now accept `direction` (INCOME/EXPENSE) and support text search, date filters, and pagination via `search`, `dateFrom`, `dateTo`, `page`, and `pageSize` query parameters; the response includes pagination metadata plus the new `direction` field.
 
 ### Authentication
 
@@ -86,12 +87,14 @@ Current frontend CSS has been aligned to the generated token variables. If a new
 
 ## Verified commands
 
-The following commands were run successfully after the token alignment work:
+The following commands were executed successfully against the current implementation:
 
 ```bash
-npm run lint:frontend
-npm run typecheck:frontend
-cd frontend && npm run build
+cd backend && npm run prisma:generate
+cd backend && npm run prisma:migrate
+cd backend && npm run build
+cd backend && npm run lint
+cd backend && npm run test
 ```
 
 ## Prisma schema

@@ -16,6 +16,11 @@ export enum TransactionType {
   GROUP = "GROUP",
 }
 
+export enum TransactionDirection {
+  INCOME = "INCOME",
+  EXPENSE = "EXPENSE",
+}
+
 export type TransactionSplit = {
   userId: string;
   percentage: number;
@@ -27,6 +32,7 @@ export interface Transaction {
   amount: number;
   category: Category;
   type: TransactionType;
+  direction: TransactionDirection;
   date: string;
   createdAt: string;
   updatedAt: string;
@@ -43,8 +49,17 @@ export interface CreateTransactionRequest {
   category: Category;
   date: string;
   type: TransactionType;
+  direction: TransactionDirection;
   paidByUserId?: string;
   groupId?: string;
   participantUserIds?: string[];
   splits?: TransactionSplit[];
+}
+
+export interface PaginatedTransactions {
+  items: Transaction[];
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
 }

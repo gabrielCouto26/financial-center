@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
+import { TransactionDirection } from '@prisma/client';
 import { GroupsService } from './groups.service';
 
 describe('GroupsService', () => {
@@ -151,6 +152,7 @@ describe('GroupsService', () => {
     prisma.transaction.findMany.mockResolvedValue([
       {
         amount: 300,
+        direction: TransactionDirection.EXPENSE,
         paidByUserId: 'user-a',
         splits: [
           { userId: 'user-a', percentage: 40 },
@@ -177,6 +179,97 @@ describe('GroupsService', () => {
         { fromUserId: 'user-b', toUserId: 'user-a', amount: 90 },
         { fromUserId: 'user-c', toUserId: 'user-a', amount: 90 },
       ],
+    });
+  });
+
+  it('builds dashboard group summary items with direction-aware net values', async () => {
+    prisma.group.findMany.mockResolvedValue([
+      {
+        id: 'group-a',
+        name: 'Trip',
+        members: [{ userId: 'user-id' }, { userId: 'friend-id' }],
+      },
+      {
+        id: 'group-b',
+        name: 'House',
+        members: [{ userId: 'user-id' }, { userId: 'roommate-id' }],
+      },
+    ]);
+    prisma.transaction.findMany.mockResolvedValue([
+      {
+        groupId: 'group-a',
+        amount: 200,
+        direction: TransactionDirection.EXPENSE,
+        paidByUserId: 'user-id',
+        splits: [
+          { userId: 'user-id', percentage: 50 },
+          { userId: 'friend-id', percentage: 50 },
+        ],
+      },
+      {
+        groupId: 'group-b',
+        amount: 100,
+        direction: TransactionDirection.INCOME,
+        paidByUserId: 'user-id',
+        splits: [
+          { userId: 'user-id', percentage: 50 },
+          { userId: 'roommate-id', percentage: 50 },
+        ],
+      },
+    ]);
+
+    await expect(service.getDashboardSummary('user-id')).resolves.toEqual({
+      totalNet: 50,
+      groupCount: 2,
+      items: [
+        { id: 'group-a', name: 'Trip', net: 100 },
+        { id: 'group-b', name: 'House', net: -50 },
+      ],
+    });
+  });
+
+  it('treats group income as reducing the receiver net position', async () => {
+    prisma.group.findUnique.mockResolvedValue({
+      id: 'group-id',
+      name: 'Trip',
+      createdByUserId: 'user-id',
+      createdAt: new Date(),
+      members: [
+        { userId: 'user-a', user: { id: 'user-a', email: 'a@example.com' } },
+        { userId: 'user-b', user: { id: 'user-b', email: 'b@example.com' } },
+      ],
+    });
+    prisma.transaction.findMany.mockResolvedValue([
+      {
+        amount: 100,
+        direction: TransactionDirection.INCOME,
+        paidByUserId: 'user-a',
+        splits: [
+          { userId: 'user-a', percentage: 50 },
+          { userId: 'user-b', percentage: 50 },
+        ],
+      },
+    ]);
+
+    await expect(service.getBalance('user-a', 'group-id')).resolves.toEqual({
+      group: { id: 'group-id', name: 'Trip' },
+      members: [
+        {
+          id: 'user-a',
+          email: 'a@example.com',
+          paid: -100,
+          share: -50,
+          net: -50,
+        },
+        {
+          id: 'user-b',
+          email: 'b@example.com',
+          paid: 0,
+          share: -50,
+          net: 50,
+        },
+      ],
+      settlements: [{ fromUserId: 'user-a', toUserId: 'user-b', amount: 50 }],
     });
   });
 });
