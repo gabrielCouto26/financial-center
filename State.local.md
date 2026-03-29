@@ -1,7 +1,7 @@
 # Estado do Projeto – Centro Financeiro Social
 
 > Última atualização: 2026-03-29
-> Branch: feature/gemini-flash-3-preview
+> Branch: master
 
 ## Visão Geral
 
@@ -22,10 +22,10 @@ Atualmente, o projeto concluiu a fundação de infraestrutura, autenticação, t
 - **Notas**: O contrato de transações suporta os 3 modos (`PERSONAL`, `COUPLE`, `GROUP`) de forma unificada.
 - **Atualização recente**: `/transactions` agora exige o campo `direction` (INCOME/EXPENSE), oferece pesquisa textual, filtros de data e paginação com metadados. O dashboard (`GET /dashboard`) consome os mesmos dados, inclui a lista detalhada de grupos (`groups.items`) e respeita `direction` nos cálculos e `recentTransactions`.
 
-### Design System e Redesign do Dashboard (Épico 5)
-- **O que foi feito**: Implementação de tokens de design (Figma), componentes atômicos (`Button`, `Input`, `Card`, `Badge`) e biblioteca de ícones SVG. Redesign total da `HomePage` (Dashboard) e migração da visão anterior para a `PersonalPage`.
+### Design System e Redesign de Páginas (Épico 5)
+- **O que foi feito**: Implementação de tokens de design (Figma), componentes atômicos (`Button`, `Input`, `Card`, `Badge`) e biblioteca de ícones SVG. Redesign total da `HomePage` (Dashboard Global) e da `PersonalPage` (Visão Pessoal Detalhada).
 - **Arquivos principais**: `frontend/src/design-system/`, `frontend/src/features/dashboard/HomePage.tsx`, `frontend/src/features/personal/PersonalPage.tsx`.
-- **Notas**: Fidelidade visual "pixel-perfect" ao Figma; uso rigoroso de CSS Variables.
+- **Notas**: Fidelidade visual "pixel-perfect" ao Figma; uso rigoroso de CSS Variables. O componente `Badge` foi atualizado para suportar `className` customizado.
 
 ### Token Pipeline e Alinhamento Global de CSS
 - **O que foi feito**: `frontend/src/design-system/tokens.json` passou a ser a fonte única de verdade para estilos tokenizáveis. Foi criado um gerador estático de variáveis CSS (`frontend/scripts/generate-css-tokens.mjs`) que produz `frontend/src/design-system/tokens.css`, agora importado pelo `frontend/src/index.css`. Todos os arquivos CSS atuais do frontend foram migrados para consumir tokens gerados ou aliases legados compatíveis.
@@ -34,11 +34,12 @@ Atualmente, o projeto concluiu a fundação de infraestrutura, autenticação, t
 
 ## Onde o Desenvolvimento Parou
 
-- **Em progresso**: Aperfeiçoar experiências complementares como modais de cadastro e recursos responsivos; o Dashboard já consome `/dashboard` real com novos blocos de grupos e `recentTransactions`.
+- **Em progresso**: Aperfeiçoar experiências complementares como modais de cadastro e recursos responsivos; o Dashboard e a PersonalPage já consomem `/dashboard` real com novos blocos de dados e `recentTransactions`.
 - **Próximos passos**:
-  1. Expandir filtros/páginas de transações com paginação completa.
-  2. Documentar fluxos de `Income` versus `Expense` para os usuários.
-  3. Ativar testes end-to-end para novos componentes (Dashboard e formulário).
+  1. Implementar formulários funcionais para criação de transações (`TransactionForm.tsx`).
+  2. Expandir filtros/páginas de transações com paginação completa na IU.
+  3. Documentar fluxos de `Income` versus `Expense` para os usuários.
+  4. Ativar testes end-to-end para novos componentes (Dashboard e formulário).
 - **Pendências**:
   - Responsividade permanece parcial (foco desktop).
   - Edição/Exclusão de grupos e transações na IU.
@@ -51,7 +52,7 @@ Atualmente, o projeto concluiu a fundação de infraestrutura, autenticação, t
   - `POST/GET /transactions`.
   - `POST/GET /couple`, `/groups`, `/groups/:id/balance`.
   - `GET /dashboard` (Real).
-- **A implementar**: Filtros avançados, exportação de CSV/PDF.
+- **A implementar**: Filtros avançados na IU, exportação de CSV/PDF.
 
 ## Estrutura de Arquivos Relevantes
 
@@ -92,5 +93,5 @@ npx prisma studio
 - **Padrão de Agente**: Research -> Strategy -> Execution (Research antes de agir).
 - **Interface**: "Editorial Finance" (Plus Jakarta Sans para display, Inter para body).
 - **Código**: TypeScript obrigatório; CSS focado em tokens e utilitários modernos (Flex/Grid).
-- **Design Tokens**: `frontend/src/design-system/tokens.json` é a fonte única de verdade; `frontend/src/design-system/tokens.css` é artefato gerado.
+- **Design Tokens**: `frontend/src/design-system/tokens.json` is the source of truth; `frontend/src/design-system/tokens.css` is artefato gerado.
 - **Compatibilidade CSS**: Variáveis legadas em `frontend/src/index.css` devem apenas referenciar tokens gerados, nunca duplicar valores brutos manualmente.

@@ -57,7 +57,14 @@ npm run tokens:build
 npm run dev
 ```
 
-Open `http://localhost:5173`. Register or log in; the JWT is stored in **`localStorage`** under `fc_access_token` (session persists across reloads).
+Open `http://localhost:5173`. Register or log in; the JWT is stored in **`localStorage`** under `fc_access_token`.
+
+### UI and Dashboard
+
+The application features a modern "Editorial Finance" design:
+- **Global Dashboard (`/`)**: Overview of all accounts (Personal, Couple, Groups) with aggregated balances and recent activity.
+- **Personal Page (`/personal`)**: Detailed breakdown of individual spending by category, monthly comparisons, and personal transaction history.
+- Both pages are fully integrated with real backend data from the `/dashboard` and `/transactions` endpoints.
 
 ## Session policy (MVP)
 
