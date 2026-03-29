@@ -12,7 +12,8 @@
     "lint:backend": "cd backend && npm run lint",
     "lint:frontend": "cd frontend && npm run lint",
     "typecheck:frontend": "cd frontend && npm run typecheck",
-    "test:backend": "cd backend && npm run test"
+    "test:backend": "cd backend && npm run test",
+    "clean:cache": "npx tsx scripts/cleanGeminiCache.ts"
   },
   "lint-staged": {
     "backend/src/**/*.ts": [
@@ -35,7 +36,11 @@
   },
   "homepage": "https://github.com/gabrielCouto26/financial-center#readme",
   "devDependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@types/node": "^25.5.0",
+    "dotenv": "^17.3.1",
     "husky": "^9.1.7",
-    "lint-staged": "^16.4.0"
+    "lint-staged": "^16.4.0",
+    "tsx": "^4.21.0"
   }
 }

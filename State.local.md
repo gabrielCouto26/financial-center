@@ -65,6 +65,7 @@ Atualmente, o projeto concluiu a fundação de infraestrutura, autenticação, t
 │   ├── App.tsx        # Routing & Layout
 │   └── index.css      # Resets + aliases legados apontando para tokens gerados
 ├── frontend/scripts/  # Scripts utilitários do frontend (ex: geração de tokens CSS)
+├── scripts/           # Scripts utilitários globais (ex: limpeza de cache Gemini)
 └── docs/              # PRD, Guidelines, Prompts
 ```
 
@@ -86,6 +87,9 @@ cd frontend && npm run build
 # Sincronização de Banco de Dados
 npx prisma migrate dev
 npx prisma studio
+
+# Limpeza de caches do Gemini (Google AI Studio)
+npm run clean:cache
 ```
 
 ## Convenções e Padrões
