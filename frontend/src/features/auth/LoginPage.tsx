@@ -70,6 +70,9 @@ export function LoginPage() {
         {mutation.isError && (
           <p className="error">{mutation.error.message}</p>
         )}
+        <p>
+          <Link to="/forgot-password">Forgot password?</Link>
+        </p>
         <button type="submit" disabled={mutation.isPending}>
           {mutation.isPending ? 'Signing in…' : 'Sign in'}
         </button>

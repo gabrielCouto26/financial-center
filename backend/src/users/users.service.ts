@@ -28,6 +28,37 @@ export class UsersService {
     return this.toSafeUser(user);
   }
 
+  async setPasswordResetToken(
+    userId: string,
+    tokenHash: string,
+    expiresAt: Date,
+  ): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordResetTokenHash: tokenHash,
+        passwordResetExpiresAt: expiresAt,
+      },
+    });
+  }
+
+  async findByPasswordResetTokenHash(tokenHash: string): Promise<User | null> {
+    return this.prisma.user.findFirst({
+      where: { passwordResetTokenHash: tokenHash },
+    });
+  }
+
+  async updatePassword(userId: string, passwordHash: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordHash,
+        passwordResetTokenHash: null,
+        passwordResetExpiresAt: null,
+      },
+    });
+  }
+
   toSafeUser(user: User): SafeUser {
     return {
       id: user.id,
