@@ -1,6 +1,6 @@
 .dashboard-page {
   display: grid;
-  grid-template-columns: var(--sidebar-width, 240px) 1fr;
+  grid-template-columns: 280px 1fr;
   min-height: 100vh;
   background-color: var(--color-bg-default);
 }
@@ -22,20 +22,21 @@
 
 .sidebar-logo h1 {
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
-  color: #1D4ED8; /* Editorial Finance Primary */
+  color: #1D4ED8;
   margin: 0;
-  line-height: 1.1;
+  line-height: 1;
 }
 
 .sidebar-logo p {
   font-size: 10px;
   font-weight: 700;
-  color: var(--color-text-muted);
+  color: #94A3B8;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   margin: 0;
+  margin-top: 4px;
 }
 
 .sidebar-nav {
@@ -73,13 +74,12 @@
 .nav-item--active::before {
   content: '';
   position: absolute;
-  left: -20px;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 0;
+  top: 0;
+  bottom: 0;
   width: 4px;
-  height: 32px;
   background-color: var(--color-primary-600);
-  border-radius: 0 4px 4px 0;
+  border-radius: 4px 0 0 4px;
 }
 
 .sidebar-footer {
@@ -94,7 +94,7 @@
 }
 
 .header {
-  height: 72px; /* Slightly taller header */
+  height: 72px;
   background-color: var(--color-bg-surface);
   border-bottom: 1px solid var(--color-border-default);
   display: flex;
@@ -107,8 +107,7 @@
 }
 
 .header-search {
-  flex: 1;
-  max-width: 600px; /* Wider search bar as per design */
+  width: 320px;
   position: relative;
 }
 
@@ -138,6 +137,7 @@
 .header-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: var(--space-5);
 }
 
@@ -276,12 +276,16 @@
 
 .main-balance {
   font-family: var(--font-display);
-  font-size: 72px; /* Even larger balance as per snippet */
+  font-size: 72px;
   font-weight: 800;
-  color: #004797; /* Match the dark blue of the heart */
+  color: #00388D;
   line-height: 1.1;
-  margin: var(--space-2) 0 var(--space-8) 0;
+  margin: 4px 0 32px 0;
   letter-spacing: -0.02em;
+}
+
+.balance-header {
+  margin-bottom: 24px;
 }
 
 .balance-summary {

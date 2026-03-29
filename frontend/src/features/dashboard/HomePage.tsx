@@ -143,8 +143,11 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
           <div className="dashboard-body">
             <div className="dashboard-grid">
               <Card className="balance-card">
-                <p className="card-title">SALDO DISPONÍVEL</p>
-                <h2 className="main-balance">R$ {availableBalance}</h2>
+                <div className="balance-header">
+                  <p className="card-title">SALDO DISPONÍVEL</p>
+                  <h2 className="main-balance">R$ {availableBalance}</h2>
+                </div>
+
                 <div className="balance-summary">
                   <div className="balance-item">
                     <p className="balance-label">Gasto no Mês</p>
