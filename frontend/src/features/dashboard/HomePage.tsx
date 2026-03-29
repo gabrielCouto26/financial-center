@@ -1,14 +1,21 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router-dom';
-import { apiFetch, clearStoredToken } from '../../services/api';
-import { CouplePanel } from '../couple/CouplePanel';
-import { CoupleOverviewCard } from './CoupleOverviewCard';
-import { GroupPanel } from '../groups/GroupPanel';
-import { GroupsOverviewCard } from './GroupsOverviewCard';
-import { RecentTransactionsCard } from './RecentTransactionsCard';
-import { SummaryCards } from './SummaryCards';
-import { TransactionForm } from '../transactions/TransactionForm';
-import type { DashboardData } from '../../types/dashboard';
+import { Link, useLocation } from 'react-router-dom';
+import { Button } from '../../design-system/Button/Button';
+import { Card } from '../../design-system/Card/Card';
+import { Input } from '../../design-system/Input/Input';
+import {
+  IconDashboard,
+  IconUser,
+  IconHeart,
+  IconUsers,
+  IconSearch,
+  IconBell,
+  IconSettings,
+  IconPlus,
+  IconWallet,
+  IconShoppingBag,
+  IconUtensils,
+} from '../../design-system/Icons';
+import './HomePage.css';
 import type { SafeUser } from '../../types/user';
 
 type Props = {
@@ -18,84 +25,214 @@ type Props = {
 };
 
 export function HomePage({ user, isLoading, hasToken }: Props) {
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const { data: dashboard, isLoading: isDashboardLoading } = useQuery({
-    queryKey: ['dashboard', user?.id],
-    queryFn: () => apiFetch<DashboardData>('/dashboard'),
-    enabled: Boolean(user?.id),
-  });
+  const location = useLocation();
 
-  function logout() {
-    clearStoredToken();
-    queryClient.removeQueries({ queryKey: ['me'] });
-    queryClient.removeQueries({ queryKey: ['couple'] });
-    queryClient.removeQueries({ queryKey: ['couple-balance'] });
-    queryClient.removeQueries({ queryKey: ['groups'] });
-    queryClient.removeQueries({ queryKey: ['group-detail'] });
-    queryClient.removeQueries({ queryKey: ['group-balance'] });
-    queryClient.removeQueries({ queryKey: ['dashboard'] });
-    queryClient.removeQueries({ queryKey: ['transactions'] });
-    navigate('/', { replace: true });
-  }
+  const getNavItemClass = (path: string) => {
+    return `nav-item ${location.pathname === path ? 'nav-item--active' : ''}`;
+  };
 
-  if (hasToken && isLoading) {
-    return <p>Loading session…</p>;
+  // Mock data for Dashboard
+  const availableBalance = "12.450,00";
+  const spentThisMonth = "4.280,00";
+  const economyPercentage = "12.5%";
+  const coupleDebt = "450,20";
+  const coupleOwesYou = "1.280,00";
+
+  const recentTransactions = [
+    {
+      id: "1",
+      name: "Supermercado Pão de Açúcar",
+      category: "Alimentação",
+      date: "Hoje, 14:30",
+      amount: "- R$ 342,50",
+      type: "expense",
+      icon: <IconShoppingBag size={24} />
+    },
+    {
+      id: "2",
+      name: "Freelance Editorial",
+      category: "Renda",
+      date: "Ontem",
+      amount: "+ R$ 2.100,00",
+      type: "income",
+      icon: <IconWallet size={24} />
+    },
+    {
+      id: "3",
+      name: "Restaurante Mirante",
+      category: "Lazer",
+      date: "12 Out",
+      amount: "- R$ 185,00",
+      type: "expense",
+      icon: <IconUtensils size={24} />
+    },
+  ];
+
+  const groups = [
+    { id: "1", name: "Viagem Praia", amount: "R$ 0,00", avatar: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=150" },
+    { id: "2", name: "Apartamento 402", amount: "- R$ 85,90", avatar: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=150" },
+    { id: "3", name: "Estudos Pós", amount: "R$ 150,00" },
+  ];
+
+  if (isLoading) {
+    return <div className="loading-state">Loading…</div>;
   }
 
   if (hasToken && user) {
-    if (isDashboardLoading || !dashboard) {
-      return <p>Loading dashboard…</p>;
-    }
-
     return (
-      <section>
-        <header className="dashboard-header">
-          <h1>Dashboard</h1>
-          <div className="user-info">
-            <span>Signed in as <strong>{user.email}</strong></span>
-            <button type="button" onClick={logout}>
-              Log out
-            </button>
+      <div className="dashboard-page">
+        <aside className="sidebar">
+          <div className="sidebar-logo">
+            <h1>Editorial Finance</h1>
           </div>
-        </header>
 
-        <div className="dashboard-content">
-          <aside className="sidebar">
-            <TransactionForm currentUserId={user.id} />
-          </aside>
+          <nav className="sidebar-nav">
+            <Link to="/" className={getNavItemClass('/')}>
+              <IconDashboard size={20} />
+              Dashboard
+            </Link>
+            <Link to="/personal" className={getNavItemClass('/personal')}>
+              <IconUser size={20} />
+              Personal
+            </Link>
+            <Link to="/couple" className={getNavItemClass('/couple')}>
+              <IconHeart size={20} />
+              Couple
+            </Link>
+            <Link to="/groups" className={getNavItemClass('/groups')}>
+              <IconUsers size={20} />
+              Groups
+            </Link>
+          </nav>
 
-          <main className="main-content">
-            <SummaryCards
-              summary={dashboard.summary}
-              month={dashboard.period.month}
-            />
-            <div className="overview-grid">
-              <CoupleOverviewCard couple={dashboard.couple} />
-              <GroupsOverviewCard groups={dashboard.groups} />
+          <div className="sidebar-footer">
+            <Button
+              variant="primary"
+              size="md"
+              icon={<IconPlus size={16} />}
+              className="w-full"
+            >
+              New Expense
+            </Button>
+          </div>
+        </aside>
+
+        <main className="main-content">
+          <header className="header">
+            <div className="header-search">
+              <IconSearch size={18} className="search-icon" />
+              <Input
+                variant="underlined"
+                placeholder="Search transactions..."
+                className="search-input"
+              />
             </div>
-            <RecentTransactionsCard
-              transactions={dashboard.recentTransactions}
-            />
-            <div className="management-grid">
-              <CouplePanel enabled currentUserId={user.id} />
-              <GroupPanel currentUserId={user.id} />
+            <div className="header-actions">
+              <IconBell size={20} className="action-icon" />
+              <IconSettings size={20} className="action-icon" />
+              <div className="user-profile">
+                <img
+                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150"
+                  alt="User profile"
+                  className="user-avatar"
+                />
+              </div>
             </div>
-          </main>
-        </div>
-      </section>
+          </header>
+
+          <div className="dashboard-body">
+            <div className="dashboard-grid">
+              <Card className="balance-card">
+                <p className="card-title">SALDO DISPONÍVEL</p>
+                <h2 className="main-balance">R$ {availableBalance}</h2>
+                <div className="balance-summary">
+                  <div className="balance-item">
+                    <p className="balance-label">Gasto no Mês</p>
+                    <p className="balance-value">R$ {spentThisMonth}</p>
+                  </div>
+                  <div className="balance-item">
+                    <p className="balance-label">Economia</p>
+                    <p className="balance-value success">+{economyPercentage}</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="couple-summary-card">
+                <div className="card-header-icon">
+                  <IconHeart size={24} className="couple-header-icon" />
+                  <p className="card-title">Resumo Casal</p>
+                </div>
+                <div className="couple-amounts">
+                  <div className="couple-sub-card couple-sub-card--debt">
+                    <p className="couple-label">Você deve</p>
+                    <p className="couple-value">R$ {coupleDebt}</p>
+                  </div>
+                  <div className="couple-sub-card couple-sub-card--credit">
+                    <p className="couple-label">Devem para você</p>
+                    <p className="couple-value">R$ {coupleOwesYou}</p>
+                  </div>
+                </div>
+              </Card>
+
+              <div className="recent-transactions-section">
+                <div className="section-header">
+                  <h3 className="section-title">Transações Recentes</h3>
+                  <Link to="#" className="view-all">Ver todas</Link>
+                </div>
+                <div className="transactions-list">
+                  {recentTransactions.map(tx => (
+                    <Card key={tx.id} className="transaction-item-card">
+                      <div className={`transaction-icon-wrapper transaction-icon--${tx.type}`}>
+                        {tx.icon}
+                      </div>
+                      <div className="transaction-details">
+                        <p className="transaction-name">{tx.name}</p>
+                        <p className="transaction-meta">{tx.category} • {tx.date}</p>
+                      </div>
+                      <p className={`transaction-amount ${tx.type === 'expense' ? 'danger' : 'success'}`}>
+                        {tx.amount}
+                      </p>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              <Card className="groups-card">
+                <p className="card-title">Seus Grupos</p>
+                <div className="groups-list">
+                  {groups.map(group => (
+                    <div key={group.id} className="group-item">
+                      {group.avatar ? (
+                        <img src={group.avatar} alt={group.name} className="group-avatar" />
+                      ) : (
+                        <div className="group-avatar-icon">
+                          <IconUsers size={24} />
+                        </div>
+                      )}
+                      <p className="group-name">{group.name}</p>
+                      <p className={`group-amount ${group.amount.startsWith('-') ? 'danger' : 'success'}`}>
+                        {group.amount}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+
+            </div>
+          </div>
+        </main>
+      </div>
     );
   }
 
   return (
-    <section>
+    <div className="auth-landing">
       <h1>Centro Financeiro Social</h1>
-      <p>
-        Epic 2 foundation: create an account or log in to manage your personal expenses.
-      </p>
-      <p>
-        <Link to="/login">Login</Link> · <Link to="/register">Register</Link>
-      </p>
-    </section>
+      <p>Manage your personal, couple, and group expenses.</p>
+      <div className="auth-links">
+        <Link to="/login">Login</Link>
+        <Link to="/register">Register</Link>
+      </div>
+    </div>
   );
 }
