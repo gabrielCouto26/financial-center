@@ -1,13 +1,13 @@
 # Estado do Projeto – Centro Financeiro Social
 
-> Última atualização: 2026-03-28
+> Última atualização: 2026-03-29
 > Branch: feature/gemini-flash-3-preview
 
 ## Visão Geral
 
 O projeto é uma aplicação de gerenciamento financeiro monorepo com backend em NestJS (Prisma/PostgreSQL) e frontend em React (Vite/TypeScript). O foco é o controle de despesas pessoais, de casal e em grupo, com um design "Editorial Finance" de alta fidelidade ao Figma.
 
-Atualmente, o projeto concluiu a fundação de infraestrutura, autenticação, transações multi-contexto (pessoal/casal/grupo) e está em fase de implementação de um redesign completo baseado no Design System atômico.
+Atualmente, o projeto concluiu a fundação de infraestrutura, autenticação, transações multi-contexto (pessoal/casal/grupo) e consolidou a base do redesign com um Design System atômico orientado por tokens.
 
 ## Features Implementadas
 
@@ -26,9 +26,14 @@ Atualmente, o projeto concluiu a fundação de infraestrutura, autenticação, t
 - **Arquivos principais**: `frontend/src/design-system/`, `frontend/src/features/dashboard/HomePage.tsx`, `frontend/src/features/personal/PersonalPage.tsx`.
 - **Notas**: Fidelidade visual "pixel-perfect" ao Figma; uso rigoroso de CSS Variables.
 
+### Token Pipeline e Alinhamento Global de CSS
+- **O que foi feito**: `frontend/src/design-system/tokens.json` passou a ser a fonte única de verdade para estilos tokenizáveis. Foi criado um gerador estático de variáveis CSS (`frontend/scripts/generate-css-tokens.mjs`) que produz `frontend/src/design-system/tokens.css`, agora importado pelo `frontend/src/index.css`. Todos os arquivos CSS atuais do frontend foram migrados para consumir tokens gerados ou aliases legados compatíveis.
+- **Arquivos principais**: `frontend/src/design-system/tokens.json`, `frontend/src/design-system/tokens.css`, `frontend/scripts/generate-css-tokens.mjs`, `frontend/src/index.css`, `frontend/src/features/dashboard/HomePage.css`, `frontend/src/features/personal/PersonalPage.css`.
+- **Notas**: O `index.css` deixou de ser a origem de valores e passou a funcionar como camada de compatibilidade para variáveis legadas (`--color-*`, `--space-*`, etc.) ainda usadas por CSS e por estilos inline em componentes TSX.
+
 ## Onde o Desenvolvimento Parou
 
-- **Em progresso**: Implementação da página de transações pessoais (`PersonalPage`) e conexão do Dashboard com dados reais do backend (remover mock data).
+- **Em progresso**: Conexão completa do Dashboard com dados reais do backend (remover mock data restantes) e evolução da `PersonalPage` com dados e interações reais.
 - **Próximos passos**:
   1. Conectar `HomePage` (Dashboard) ao endpoint `GET /dashboard`.
   2. Implementar modal/página de "Nova Despesa" integrada ao Design System.
@@ -54,10 +59,11 @@ Atualmente, o projeto concluiu a fundação de infraestrutura, autenticação, t
 /
 ├── backend/src/       # NestJS Modules (auth, users, transactions, couple, groups, dashboard)
 ├── frontend/src/
-│   ├── design-system/ # Atomic Components & Tokens
+│   ├── design-system/ # Atomic Components, tokens.json e tokens.css gerado
 │   ├── features/      # Business features (dashboard, personal, auth, groups)
 │   ├── App.tsx        # Routing & Layout
-│   └── index.css      # Custom vars & resets
+│   └── index.css      # Resets + aliases legados apontando para tokens gerados
+├── frontend/scripts/  # Scripts utilitários do frontend (ex: geração de tokens CSS)
 └── docs/              # PRD, Guidelines, Prompts
 ```
 
@@ -67,6 +73,14 @@ Atualmente, o projeto concluiu a fundação de infraestrutura, autenticação, t
 # Iniciar ambiente de desenvolvimento
 cd backend && npm run start:dev
 cd frontend && npm run dev
+
+# Gerar variáveis CSS a partir dos tokens
+cd frontend && npm run tokens:build
+
+# Verificações executadas com sucesso após o alinhamento dos tokens
+npm run lint:frontend
+npm run typecheck:frontend
+cd frontend && npm run build
 
 # Sincronização de Banco de Dados
 npx prisma migrate dev
@@ -78,3 +92,5 @@ npx prisma studio
 - **Padrão de Agente**: Research -> Strategy -> Execution (Research antes de agir).
 - **Interface**: "Editorial Finance" (Plus Jakarta Sans para display, Inter para body).
 - **Código**: TypeScript obrigatório; CSS focado em tokens e utilitários modernos (Flex/Grid).
+- **Design Tokens**: `frontend/src/design-system/tokens.json` é a fonte única de verdade; `frontend/src/design-system/tokens.css` é artefato gerado.
+- **Compatibilidade CSS**: Variáveis legadas em `frontend/src/index.css` devem apenas referenciar tokens gerados, nunca duplicar valores brutos manualmente.

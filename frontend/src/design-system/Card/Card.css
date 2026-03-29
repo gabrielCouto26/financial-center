@@ -1,21 +1,21 @@
 .ds-card {
-  border-radius: var(--radius-lg);
-  background-color: var(--color-bg-surface);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--ds-components-card-radius);
+  background-color: var(--ds-components-card-background);
+  box-shadow: var(--ds-components-card-shadow);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   overflow: hidden;
 }
 
 .ds-card--primary {
-  background-color: var(--color-primary);
-  color: var(--color-text-inverse);
+  background-color: var(--ds-colors-primary-500);
+  color: var(--ds-colors-text-inverse);
 }
 
 .ds-card--insight {
-  background: var(--color-insight-gradient);
-  color: var(--color-text-inverse);
+  background: var(--ds-colors-insight-gradient);
+  color: var(--ds-colors-text-inverse);
 }
 
 .ds-card--insight h3 {
-  color: var(--color-text-inverse);
+  color: var(--ds-colors-text-inverse);
 }

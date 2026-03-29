@@ -1,37 +1,37 @@
 .ds-badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  font-size: 11px;
-  font-weight: 700;
-  font-family: var(--font-primary);
+  padding: var(--ds-components-badge-paddingY) var(--ds-components-badge-paddingX);
+  font-size: var(--ds-components-badge-fontSize);
+  font-weight: var(--ds-typography-fontWeight-bold);
+  font-family: var(--ds-typography-fontFamily-primary);
 }
 
 .ds-badge--pill {
-  border-radius: var(--radius-full);
+  border-radius: var(--ds-components-badge-radius);
 }
 
 .ds-badge--success {
-  background-color: #E6F4EA;
-  color: #166534;
+  background-color: var(--ds-components-badge-variants-success-bg);
+  color: var(--ds-components-badge-variants-success-text);
 }
 
 .ds-badge--danger {
-  background-color: #FEE2E2;
-  color: #991B1B;
+  background-color: var(--ds-components-badge-variants-danger-bg);
+  color: var(--ds-components-badge-variants-danger-text);
 }
 
 .ds-badge--warning {
-  background-color: #FEF3C7;
-  color: #92400E;
+  background-color: var(--ds-components-badge-variants-warning-bg);
+  color: var(--ds-components-badge-variants-warning-text);
 }
 
 .ds-badge--info {
-  background-color: #DBEAFE;
-  color: #1E40AF;
+  background-color: var(--ds-components-badge-variants-info-bg);
+  color: var(--ds-components-badge-variants-info-text);
 }
 
 .ds-badge--neutral {
-  background-color: var(--color-neutral-100);
-  color: var(--color-neutral-700);
+  background-color: var(--ds-components-badge-variants-neutral-bg);
+  color: var(--ds-components-badge-variants-neutral-text);
 }

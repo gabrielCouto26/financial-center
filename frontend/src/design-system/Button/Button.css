@@ -2,43 +2,42 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
+  gap: var(--ds-spacing-2);
   border: 1px solid transparent;
   cursor: pointer;
-  font-family: var(--font-primary);
-  font-weight: 600;
+  font-family: var(--ds-typography-fontFamily-primary);
+  font-weight: var(--ds-typography-fontWeight-semibold);
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .ds-button--pill {
-  border-radius: var(--radius-full);
+  border-radius: var(--ds-components-button-radius);
 }
 
-/* Variants */
 .ds-button--primary {
-  background-color: var(--color-primary);
-  color: var(--color-text-inverse);
+  background-color: var(--ds-components-button-variants-primary-bg);
+  color: var(--ds-components-button-variants-primary-text);
 }
 
 .ds-button--primary:hover {
   filter: brightness(1.1);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--ds-shadows-sm);
 }
 
 .ds-button--secondary {
-  background-color: transparent;
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+  background-color: var(--ds-components-button-variants-secondary-bg);
+  border-color: var(--ds-components-button-variants-secondary-border);
+  color: var(--ds-components-button-variants-secondary-text);
 }
 
 .ds-button--secondary:hover {
-  background-color: rgba(29, 78, 216, 0.05); /* Fade of primary */
+  background-color: var(--ds-components-button-variants-secondary-hoverBg);
 }
 
 .ds-button--text {
-  background-color: transparent;
-  color: var(--color-primary);
+  background-color: var(--ds-components-button-variants-text-bg);
+  color: var(--ds-components-button-variants-text-text);
   padding-left: 0;
   padding-right: 0;
 }
@@ -47,23 +46,22 @@
   text-decoration: underline;
 }
 
-/* Sizes */
 .ds-button--sm {
-  height: 32px;
-  padding: 0 var(--space-3);
-  font-size: 12px;
+  height: var(--ds-components-button-sizes-sm-height);
+  padding: 0 var(--ds-components-button-sizes-sm-paddingX);
+  font-size: var(--ds-components-button-sizes-sm-fontSize);
 }
 
 .ds-button--md {
-  height: 40px;
-  padding: 0 var(--space-5);
-  font-size: 14px;
+  height: var(--ds-components-button-sizes-md-height);
+  padding: 0 var(--ds-components-button-sizes-md-paddingX);
+  font-size: var(--ds-components-button-sizes-md-fontSize);
 }
 
 .ds-button--lg {
-  height: 48px;
-  padding: 0 var(--space-6);
-  font-size: 16px;
+  height: var(--ds-components-button-sizes-lg-height);
+  padding: 0 var(--ds-components-button-sizes-lg-paddingX);
+  font-size: var(--ds-components-button-sizes-lg-fontSize);
 }
 
 .ds-button:disabled {

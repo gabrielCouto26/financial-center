@@ -1,6 +1,8 @@
-# Centro Financeiro Social — Epic 1 (foundation)
+# Centro Financeiro Social
 
 Monorepo layout: `backend/` (NestJS + Prisma + PostgreSQL), `frontend/` (Vite + React + TypeScript).
+
+The frontend uses a token-driven design system. `frontend/src/design-system/tokens.json` is the source of truth, `frontend/scripts/generate-css-tokens.mjs` exports `frontend/src/design-system/tokens.css`, and `frontend/src/index.css` keeps legacy CSS variable aliases for compatibility.
 
 ## Prerequisites
 
@@ -50,6 +52,7 @@ cp .env.example .env.local
 # VITE_API_URL defaults to http://localhost:3000/api
 
 npm install
+npm run tokens:build
 npm run dev
 ```
 
@@ -67,9 +70,29 @@ Open `http://localhost:5173`. Register or log in; the JWT is stored in **`localS
 |-----------|----------------|----------------------|
 | `backend` | `npm run build` | Compile NestJS      |
 | `backend` | `npm run lint`  | ESLint              |
+| `frontend`| `npm run tokens:build` | Generate CSS variables from `tokens.json` |
 | `frontend`| `npm run build` | Production bundle   |
 | `frontend`| `npm run typecheck` | TypeScript check |
 | `frontend`| `npm run lint`  | ESLint              |
+
+## Frontend design tokens
+
+- Source of truth: `frontend/src/design-system/tokens.json`
+- Generated output: `frontend/src/design-system/tokens.css`
+- Generator script: `frontend/scripts/generate-css-tokens.mjs`
+- Compatibility layer: `frontend/src/index.css`
+
+Current frontend CSS has been aligned to the generated token variables. If a new reusable design value is needed in CSS, add it to `tokens.json` first and then regenerate `tokens.css` instead of hardcoding it directly in a stylesheet.
+
+## Verified commands
+
+The following commands were run successfully after the token alignment work:
+
+```bash
+npm run lint:frontend
+npm run typecheck:frontend
+cd frontend && npm run build
+```
 
 ## Prisma schema
 
