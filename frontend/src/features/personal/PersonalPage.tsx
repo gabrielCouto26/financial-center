@@ -217,9 +217,8 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
               variant="primary"
               size="md"
               icon={<IconPlus size={16} />}
-              className="w-full"
+              className="w-full new-expense-btn"
               disabled
-              title="Transaction creation is not available on this screen yet."
             >
               New Expense
             </Button>
@@ -232,7 +231,7 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
               <IconSearch size={18} className="search-icon" />
               <Input
                 variant="underlined"
-                placeholder="Search is unavailable on this page"
+                placeholder="Search transactions..."
                 className="search-input"
                 disabled
               />
@@ -258,7 +257,7 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
 
           <div className="personal-body">
             <section className="hero-section">
-              <div>
+              <div className="hero-content">
                 <p className="hero-title">Personal Statement</p>
                 <h1 className="hero-balance">
                   {formatCurrency(dashboard.personal.currentMonthTotal)}
@@ -267,9 +266,11 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
                   Total spent in {formatMonth(dashboard.period.month)}
                 </p>
               </div>
-              <Badge variant={comparisonBadge.variant} pill>
-                {comparisonBadge.text}
-              </Badge>
+              <div className="hero-badge-container">
+                <Badge variant={comparisonBadge.variant} pill className="comparison-badge">
+                  {comparisonBadge.text}
+                </Badge>
+              </div>
             </section>
 
             <section className="summary-grid">
@@ -283,7 +284,7 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
                           {categoryIcons[categoryItem.category]}
                         </div>
                         <span className="summary-card-amount">
-                          {formatCurrency(categoryItem.amount, 0)}
+                          {formatCurrency(categoryItem.amount)}
                         </span>
                       </div>
                       <div className="summary-card-footer">
@@ -324,9 +325,9 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
                 ))}
               </div>
               <div className="avatar-stack">
-                <div className="avatar bg-blue-light" />
-                <div className="avatar bg-green-light" />
-                <div className="avatar bg-red-light" />
+                <div className="avatar-capsule bg-blue-mid">MO</div>
+                <div className="avatar-capsule bg-green-mid">GYM</div>
+                <div className="avatar-capsule bg-orange-mid">PUB</div>
               </div>
             </section>
 
