@@ -1,0 +1,72 @@
+{
+  "@eslint/js": {
+    "current": "9.39.4",
+    "wanted": "9.39.4",
+    "latest": "10.0.1",
+    "dependent": "backend",
+    "location": "/home/gabriel/env/dev/financial-center/backend/node_modules/@eslint/js"
+  },
+  "@prisma/adapter-pg": {
+    "current": "7.5.0",
+    "wanted": "7.6.0",
+    "latest": "7.6.0",
+    "dependent": "backend",
+    "location": "/home/gabriel/env/dev/financial-center/backend/node_modules/@prisma/adapter-pg"
+  },
+  "@prisma/client": {
+    "current": "7.5.0",
+    "wanted": "7.6.0",
+    "latest": "7.6.0",
+    "dependent": "backend",
+    "location": "/home/gabriel/env/dev/financial-center/backend/node_modules/@prisma/client"
+  },
+  "@types/node": {
+    "current": "22.19.15",
+    "wanted": "22.19.15",
+    "latest": "25.5.0",
+    "dependent": "backend",
+    "location": "/home/gabriel/env/dev/financial-center/backend/node_modules/@types/node"
+  },
+  "@types/supertest": {
+    "current": "6.0.3",
+    "wanted": "6.0.3",
+    "latest": "7.2.0",
+    "dependent": "backend",
+    "location": "/home/gabriel/env/dev/financial-center/backend/node_modules/@types/supertest"
+  },
+  "eslint": {
+    "current": "9.39.4",
+    "wanted": "9.39.4",
+    "latest": "10.1.0",
+    "dependent": "backend",
+    "location": "/home/gabriel/env/dev/financial-center/backend/node_modules/eslint"
+  },
+  "globals": {
+    "current": "16.5.0",
+    "wanted": "16.5.0",
+    "latest": "17.4.0",
+    "dependent": "backend",
+    "location": "/home/gabriel/env/dev/financial-center/backend/node_modules/globals"
+  },
+  "prisma": {
+    "current": "7.5.0",
+    "wanted": "7.6.0",
+    "latest": "7.6.0",
+    "dependent": "backend",
+    "location": "/home/gabriel/env/dev/financial-center/backend/node_modules/prisma"
+  },
+  "typescript": {
+    "current": "5.9.3",
+    "wanted": "5.9.3",
+    "latest": "6.0.2",
+    "dependent": "backend",
+    "location": "/home/gabriel/env/dev/financial-center/backend/node_modules/typescript"
+  },
+  "typescript-eslint": {
+    "current": "8.57.1",
+    "wanted": "8.58.0",
+    "latest": "8.58.0",
+    "dependent": "backend",
+    "location": "/home/gabriel/env/dev/financial-center/backend/node_modules/typescript-eslint"
+  }
+}
