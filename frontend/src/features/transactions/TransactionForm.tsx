@@ -2,7 +2,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { z } from "zod";
+import { Button } from "../../design-system/Button/Button";
+import { Input } from "../../design-system/Input/Input";
+import {
+  IconDashboard,
+  IconUser,
+  IconHeart,
+  IconUsers,
+  IconSearch,
+  IconBell,
+  IconSettings,
+  IconPlus,
+} from "../../design-system/Icons";
 import { apiFetch } from "../../services/api";
 import type { CoupleSummary } from "../../types/couple";
 import type { GroupDetail, GroupSummary } from "../../types/group";
@@ -13,6 +26,8 @@ import {
   type Transaction,
   TransactionType,
 } from "../../types/transaction";
+import type { SafeUser } from "../../types/user";
+import "./TransactionForm.css";
 
 const splitSchema = z.object({
   userId: z.string().uuid(),
@@ -104,12 +119,17 @@ const schema = z
 type FormValues = z.infer<typeof schema>;
 
 type Props = {
-  currentUserId: string;
+  user?: SafeUser;
+  isLoading?: boolean;
+  hasToken?: boolean;
 };
 
 type SplitMode = "default" | "subset" | "custom";
 
-export function TransactionForm({ currentUserId }: Props) {
+export function TransactionForm({ user, isLoading, hasToken }: Props) {
+  const currentUserId = user?.id ?? "";
+  const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const { data: couple } = useQuery({
     queryKey: ["couple", currentUserId],
@@ -125,7 +145,6 @@ export function TransactionForm({ currentUserId }: Props) {
     handleSubmit,
     watch,
     formState: { errors },
-    reset,
     setValue,
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -136,11 +155,13 @@ export function TransactionForm({ currentUserId }: Props) {
     },
   });
 
+  const amount = watch("amount");
   const type = watch("type");
   const groupId = watch("groupId");
   const paidByUserId = watch("paidByUserId");
   const participantUserIds = watch("participantUserIds");
   const splits = watch("splits");
+  const categoryValue = watch("category");
   const splitMode: SplitMode = splits
     ? "custom"
     : participantUserIds && participantUserIds.length > 0
@@ -226,11 +247,7 @@ export function TransactionForm({ currentUserId }: Props) {
           queryKey: ["group-balance", currentUserId, selectedGroupId],
         });
       }
-      reset({
-        date: new Date().toISOString().split("T")[0],
-        direction: TransactionDirection.EXPENSE,
-        type: TransactionType.PERSONAL,
-      });
+      navigate(-1);
     },
   });
 
@@ -298,14 +315,6 @@ export function TransactionForm({ currentUserId }: Props) {
     );
   }
 
-  function setCustomModeForGroup() {
-    setValue("participantUserIds", undefined);
-    setValue(
-      "splits",
-      createEqualSplits(groupMembers.map((member) => member.id)),
-    );
-  }
-
   function createEqualSplits(userIds: string[]) {
     if (userIds.length === 0) {
       return [];
@@ -329,7 +338,7 @@ export function TransactionForm({ currentUserId }: Props) {
     [Category.FOOD]: "Food",
     [Category.TRANSPORT]: "Transport",
     [Category.HOUSING]: "Housing",
-    [Category.ENTERTAINMENT]: "Entertainment",
+    [Category.ENTERTAINMENT]: "Leisure",
     [Category.HEALTH]: "Health",
     [Category.SHOPPING]: "Shopping",
     [Category.EDUCATION]: "Education",
@@ -337,266 +346,500 @@ export function TransactionForm({ currentUserId }: Props) {
     [Category.OTHER]: "Other",
   };
 
+  const getNavItemClass = (path: string) => {
+    return `nav-item ${location.pathname === path ? "nav-item--active" : ""}`;
+  };
+
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(val);
+  };
+
+  if (isLoading) {
+    return <div className="loading-state">Loading…</div>;
+  }
+
+  if (!hasToken || !user) {
+    return <div className="loading-state">Redirecting to login...</div>;
+  }
+
+  const userInitial = user.email.slice(0, 1).toUpperCase();
+
   return (
-    <form
-      onSubmit={handleSubmit((values) => mutation.mutate(values))}
-      className="form"
-    >
-      <h2>Add Transaction</h2>
+    <div className="transaction-form-page">
+      <aside className="sidebar">
+        <div className="sidebar-logo">
+          <h1>Editorial Finance</h1>
+        </div>
 
-      <label>
-        Name
-        <input type="text" {...register("name")} />
-      </label>
-      {errors.name && <p className="error">{errors.name.message}</p>}
-
-      <label>
-        Amount
-        <input type="number" step="0.01" {...register("amount")} />
-      </label>
-      {errors.amount && <p className="error">{errors.amount.message}</p>}
-
-      <label>
-        Category
-        <select {...register("category")}>
-          {Object.values(Category).map((cat) => (
-            <option key={cat} value={cat}>
-              {categoryLabels[cat]}
-            </option>
-          ))}
-        </select>
-      </label>
-      {errors.category && <p className="error">{errors.category.message}</p>}
-
-      <label>
-        Date
-        <input type="date" {...register("date")} />
-      </label>
-      {errors.date && <p className="error">{errors.date.message}</p>}
-
-      <label>
-        Type
-        <select {...register("type")}>
-          <option value={TransactionType.PERSONAL}>Personal</option>
-          <option value={TransactionType.COUPLE} disabled={!couple}>
+        <nav className="sidebar-nav">
+          <Link to="/dashboard" className={getNavItemClass("/dashboard")}>
+            <IconDashboard size={20} />
+            Dashboard
+          </Link>
+          <Link to="/personal" className={getNavItemClass("/personal")}>
+            <IconUser size={20} />
+            Personal
+          </Link>
+          <span className="nav-item nav-item--disabled" aria-disabled="true">
+            <IconHeart size={20} />
             Couple
-          </option>
-          <option value={TransactionType.GROUP} disabled={!groups?.length}>
-            Group
-          </option>
-        </select>
-      </label>
+          </span>
+          <span className="nav-item nav-item--disabled" aria-disabled="true">
+            <IconUsers size={20} />
+            Groups
+          </span>
+        </nav>
 
-      <label>
-        Direction
-        <select {...register("direction")}>
-          <option value={TransactionDirection.EXPENSE}>Expense</option>
-          <option value={TransactionDirection.INCOME}>Income</option>
-        </select>
-      </label>
+        <div className="sidebar-footer">
+          <Button
+            variant="primary"
+            size="md"
+            icon={<IconPlus size={16} />}
+            className="w-full"
+            disabled
+          >
+            New Expense
+          </Button>
+        </div>
+      </aside>
 
-      {type === TransactionType.COUPLE && (
-        <>
-          {!couple ? (
-            <p className="hint">
-              Link a partner before adding couple expenses.
+      <main className="main-content">
+        <header className="header">
+          <div className="header-search">
+            <IconSearch size={18} className="search-icon" />
+            <Input
+              variant="underlined"
+              placeholder="Search..."
+              className="search-input"
+              disabled
+            />
+          </div>
+          <div className="header-actions">
+            <IconBell size={20} className="action-icon" />
+            <IconSettings size={20} className="action-icon" />
+            <div className="user-profile">
+              <span className="user-avatar-fallback">{userInitial}</span>
+            </div>
+          </div>
+        </header>
+
+        <div className="transaction-form-content">
+          <header className="transaction-form-header">
+            <span className="entry-creation">Entry Creation</span>
+            <h1>
+              Record an <span className="highlight">Expense</span>
+            </h1>
+            <p>
+              Log your latest transaction into the digital ledger. Your editorial
+              clarity begins with precise documentation.
             </p>
-          ) : (
-            <>
-              <label>
-                Paid by
-                <select {...register("paidByUserId")}>
-                  {coupleMembers.map((member) => (
-                    <option key={member.id} value={member.id}>
-                      {member.id === currentUserId
-                        ? "You"
-                        : couple.partner.email}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div className="split-toggle">
-                <button
-                  type="button"
-                  className={
-                    splitMode === "default"
-                      ? "secondary-button active"
-                      : "secondary-button"
-                  }
-                  onClick={setDefaultMode}
-                >
-                  50/50 Split
-                </button>
-                <button
-                  type="button"
-                  className={
-                    splitMode === "custom"
-                      ? "secondary-button active"
-                      : "secondary-button"
-                  }
-                  onClick={setCustomModeForCouple}
-                >
-                  Custom Split
-                </button>
+          </header>
+
+          <form
+            onSubmit={handleSubmit((values) => mutation.mutate(values))}
+            className="transaction-form-grid"
+          >
+            {/* Main Content Area */}
+            <div className="transaction-form-main">
+              <div className="form-card">
+                <div className="flex flex-col gap-8">
+                  {/* Transaction Name */}
+                  <div
+                    className={`input-group ${errors.name ? "field-error" : ""}`}
+                  >
+                    <label>Transaction Name</label>
+                    <input
+                      type="text"
+                      className="input-field"
+                      placeholder="e.g. Weekly Groceries"
+                      {...register("name")}
+                    />
+                    {errors.name && (
+                      <p className="error-text">{errors.name.message}</p>
+                    )}
+                  </div>
+
+                  {/* Amount and Date Row */}
+                  <div className="form-row">
+                    <div
+                      className={`input-group ${errors.amount ? "field-error" : ""}`}
+                    >
+                      <label>Amount</label>
+                      <div className="amount-input-container">
+                        <span className="currency-prefix">R$</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          className="input-field amount-input"
+                          placeholder="0,00"
+                          {...register("amount")}
+                        />
+                      </div>
+                      {errors.amount && (
+                        <p className="error-text">{errors.amount.message}</p>
+                      )}
+                    </div>
+
+                    <div
+                      className={`input-group ${errors.date ? "field-error" : ""}`}
+                    >
+                      <label>Date</label>
+                      <div className="date-input-container">
+                        <input
+                          type="date"
+                          className="input-field"
+                          {...register("date")}
+                        />
+                        <span className="material-symbols-outlined calendar-icon">
+                          calendar_today
+                        </span>
+                      </div>
+                      {errors.date && (
+                        <p className="error-text">{errors.date.message}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
-              {splits?.map((split, index) => {
-                const label =
-                  split.userId === currentUserId
-                    ? "Your share (%)"
-                    : `${couple.partner.email} share (%)`;
-                return (
-                  <label key={`${split.userId}-${index}`}>
-                    {label}
-                    <input
-                      type="number"
-                      step="0.01"
-                      {...register(`splits.${index}.percentage` as const)}
-                    />
-                    <input
-                      type="hidden"
-                      {...register(`splits.${index}.userId` as const)}
-                      value={split.userId}
-                    />
-                  </label>
-                );
-              })}
-            </>
-          )}
-        </>
-      )}
 
-      {type === TransactionType.GROUP && (
-        <>
-          {!groups?.length ? (
-            <p className="hint">Create a group before adding group expenses.</p>
-          ) : (
-            <>
-              <label>
-                Group
-                <select {...register("groupId")}>
-                  {groups.map((group) => (
-                    <option key={group.id} value={group.id}>
-                      {group.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Paid by
-                <select {...register("paidByUserId")}>
-                  {groupMembers.map((member) => (
-                    <option key={member.id} value={member.id}>
-                      {member.id === currentUserId ? "You" : member.email}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <div className="split-toggle">
+              {/* Type Toggle */}
+              <div className="type-toggle">
                 <button
                   type="button"
-                  className={
-                    splitMode === "default"
-                      ? "secondary-button active"
-                      : "secondary-button"
-                  }
-                  onClick={setDefaultMode}
+                  className={`type-toggle-btn ${type === TransactionType.PERSONAL ? "active" : ""}`}
+                  onClick={() => setValue("type", TransactionType.PERSONAL)}
                 >
-                  All Members
+                  <span className="material-symbols-outlined">person</span>
+                  Personal
                 </button>
                 <button
                   type="button"
-                  className={
-                    splitMode === "subset"
-                      ? "secondary-button active"
-                      : "secondary-button"
-                  }
-                  onClick={setSubsetMode}
+                  className={`type-toggle-btn ${type === TransactionType.COUPLE ? "active" : ""}`}
+                  disabled={!couple}
+                  onClick={() => setValue("type", TransactionType.COUPLE)}
                 >
-                  Selected Members
+                  <span className="material-symbols-outlined">favorite</span>
+                  Couple
                 </button>
                 <button
                   type="button"
-                  className={
-                    splitMode === "custom"
-                      ? "secondary-button active"
-                      : "secondary-button"
-                  }
-                  onClick={setCustomModeForGroup}
+                  className={`type-toggle-btn ${type === TransactionType.GROUP ? "active" : ""}`}
+                  disabled={!groups?.length}
+                  onClick={() => setValue("type", TransactionType.GROUP)}
                 >
-                  Custom Split
+                  <span className="material-symbols-outlined">group</span>
+                  Groups
                 </button>
               </div>
 
-              {splitMode === "subset" && (
-                <fieldset className="checkbox-group">
-                  <legend>Participants</legend>
-                  {groupMembers.map((member) => (
-                    <label key={member.id} className="checkbox-row">
-                      <input
-                        type="checkbox"
-                        value={member.id}
-                        {...register("participantUserIds")}
-                      />
-                      {member.id === currentUserId ? "You" : member.email}
-                    </label>
-                  ))}
-                </fieldset>
+              {/* Split Configuration */}
+              {(type === TransactionType.COUPLE ||
+                type === TransactionType.GROUP) && (
+                <div className="split-config-card">
+                  <div className="split-config-header">
+                    <h3 className="split-config-title">
+                      <span className="material-symbols-outlined">
+                        call_split
+                      </span>
+                      Split Configuration
+                    </h3>
+                    <div className="split-mode-toggle">
+                      <button
+                        type="button"
+                        className={`split-mode-btn ${splitMode === "default" ? "active" : ""}`}
+                        onClick={setDefaultMode}
+                      >
+                        Equal (50/50)
+                      </button>
+                      <button
+                        type="button"
+                        className={`split-mode-btn ${splitMode === "custom" || splitMode === "subset" ? "active" : ""}`}
+                        onClick={
+                          type === TransactionType.COUPLE
+                            ? setCustomModeForCouple
+                            : setSubsetMode
+                        }
+                      >
+                        Custom
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="members-grid">
+                    {type === TransactionType.COUPLE &&
+                      coupleMembers.map((member) => {
+                        const isSelected =
+                          splitMode === "default" ||
+                          splits?.some((s) => s.userId === member.id);
+                        const percentage =
+                          splitMode === "default"
+                            ? 50
+                            : splits?.find((s) => s.userId === member.id)
+                                ?.percentage ?? 0;
+                        const shareAmount = (amount * percentage) / 100;
+
+                        return (
+                          <div
+                            key={member.id}
+                            className={`member-card ${isSelected ? "selected" : ""}`}
+                            onClick={() => {
+                              if (splitMode === "custom") {
+                                // Toggle logic for custom splits if needed, 
+                                // though for couple usually it's both or nothing in equal mode
+                                // For now, just display.
+                              }
+                            }}
+                          >
+                            <div className="member-avatar" />
+                            <div className="member-info">
+                              <p className="member-name">
+                                {member.id === currentUserId
+                                  ? "You"
+                                  : couple?.partner.email}
+                              </p>
+                              <p className="member-share">
+                                {formatCurrency(shareAmount)}
+                              </p>
+                            </div>
+                            <span
+                              className={`material-symbols-outlined select-icon ${isSelected ? "active" : ""}`}
+                              style={isSelected ? { fontVariationSettings: "'FILL' 1" } : {}}
+                            >
+                              {isSelected ? "check_circle" : "circle"}
+                            </span>
+                          </div>
+                        );
+                      })}
+
+                    {type === TransactionType.GROUP &&
+                      groupMembers.map((member) => {
+                        const isSelected =
+                          splitMode === "default" ||
+                          participantUserIds?.includes(member.id) ||
+                          splits?.some((s) => s.userId === member.id);
+
+                        let percentage = 0;
+                        if (splitMode === "default") {
+                          percentage = 100 / (groupMembers.length || 1);
+                        } else if (splitMode === "subset") {
+                          const count = participantUserIds?.length || 1;
+                          percentage = participantUserIds?.includes(member.id)
+                            ? 100 / count
+                            : 0;
+                        } else {
+                          percentage =
+                            splits?.find((s) => s.userId === member.id)
+                              ?.percentage ?? 0;
+                        }
+                        const shareAmount = (amount * percentage) / 100;
+
+                        return (
+                          <div
+                            key={member.id}
+                            className={`member-card ${isSelected ? "selected" : ""}`}
+                            onClick={() => {
+                              if (splitMode === "subset") {
+                                const current = participantUserIds || [];
+                                if (current.includes(member.id)) {
+                                  setValue(
+                                    "participantUserIds",
+                                    current.filter((id) => id !== member.id),
+                                  );
+                                } else {
+                                  setValue("participantUserIds", [
+                                    ...current,
+                                    member.id,
+                                  ]);
+                                }
+                              }
+                            }}
+                          >
+                            <div className="member-avatar" />
+                            <div className="member-info">
+                              <p className="member-name">
+                                {member.id === currentUserId
+                                  ? "You"
+                                  : member.email}
+                              </p>
+                              <p className="member-share">
+                                {formatCurrency(shareAmount)}
+                              </p>
+                            </div>
+                            <span
+                              className={`material-symbols-outlined select-icon ${isSelected ? "active" : ""}`}
+                              style={isSelected ? { fontVariationSettings: "'FILL' 1" } : {}}
+                            >
+                              {isSelected ? "check_circle" : "circle"}
+                            </span>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
               )}
+            </div>
 
-              {splitMode === "custom" &&
-                splits?.map((split, index) => {
-                  const member = groupMembers.find(
-                    (item) => item.id === split.userId,
-                  );
-                  const label =
-                    split.userId === currentUserId
-                      ? "You"
-                      : (member?.email ?? split.userId);
-                  return (
-                    <label key={`${split.userId}-${index}`}>
-                      {label} share (%)
-                      <input
-                        type="number"
-                        step="0.01"
-                        {...register(`splits.${index}.percentage` as const)}
-                      />
-                      <input
-                        type="hidden"
-                        {...register(`splits.${index}.userId` as const)}
-                        value={split.userId}
-                      />
-                    </label>
-                  );
-                })}
-            </>
-          )}
-        </>
-      )}
+            {/* Sidebar Area */}
+            <aside className="transaction-form-aside">
+              {/* Category Selector */}
+              <div className="form-card">
+                <label className="block text-sm font-bold text-on-surface-variant mb-6 uppercase tracking-[0.1em]">
+                  Category
+                </label>
+                <div className="category-grid">
+                  {Object.values(Category).map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      className={`category-btn ${categoryValue === cat ? "active" : ""}`}
+                      onClick={() => setValue("category", cat)}
+                    >
+                      <div className="category-icon-wrapper">
+                        <span className="material-symbols-outlined">
+                          {getCategoryIcon(cat)}
+                        </span>
+                      </div>
+                      <span className="label">{categoryLabels[cat]}</span>
+                    </button>
+                  ))}
+                </div>
+                {errors.category && (
+                  <p className="error-text">{errors.category.message}</p>
+                )}
+              </div>
 
-      {errors.paidByUserId && (
-        <p className="error">{errors.paidByUserId.message}</p>
-      )}
-      {errors.groupId && <p className="error">{errors.groupId.message}</p>}
-      {errors.participantUserIds && (
-        <p className="error">
-          {"message" in errors.participantUserIds
-            ? errors.participantUserIds.message
-            : "Select the group participants."}
-        </p>
-      )}
-      {errors.splits && (
-        <p className="error">
-          {"message" in errors.splits
-            ? errors.splits.message
-            : "Review split values."}
-        </p>
-      )}
-      {mutation.isError && <p className="error">{mutation.error.message}</p>}
+              {/* Paid By & Direction */}
+              <div className="form-card">
+                <div className="space-y-6">
+                  <div className="input-group">
+                    <label className="tracking-[0.1em]">Who Paid</label>
+                    <select
+                      className="input-field"
+                      {...register("paidByUserId")}
+                    >
+                      {type === TransactionType.PERSONAL ? (
+                        <option value={currentUserId}>Me</option>
+                      ) : type === TransactionType.COUPLE ? (
+                        coupleMembers.map((member) => (
+                          <option key={member.id} value={member.id}>
+                            {member.id === currentUserId
+                              ? "Me"
+                              : couple?.partner.email}
+                          </option>
+                        ))
+                      ) : (
+                        groupMembers.map((member) => (
+                          <option key={member.id} value={member.id}>
+                            {member.id === currentUserId ? "Me" : member.email}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
 
-      <button type="submit" disabled={mutation.isPending}>
-        {mutation.isPending ? "Saving…" : "Add Transaction"}
-      </button>
-    </form>
+                  <div className="input-group">
+                    <label>Type</label>
+                    <select className="input-field" {...register("direction")}>
+                      <option value={TransactionDirection.EXPENSE}>
+                        Expense
+                      </option>
+                      <option value={TransactionDirection.INCOME}>
+                        Income
+                      </option>
+                    </select>
+                  </div>
+
+                  {type === TransactionType.GROUP && (
+                    <div className="input-group">
+                      <label>Group</label>
+                      <select className="input-field" {...register("groupId")}>
+                        {groups?.map((group) => (
+                          <option key={group.id} value={group.id}>
+                            {group.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col gap-4">
+                <button
+                  type="submit"
+                  className="submit-btn"
+                  disabled={mutation.isPending}
+                >
+                  {mutation.isPending ? "Saving..." : "Save Expense"}
+                </button>
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => navigate(-1)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </aside>
+
+            {/* Global Errors */}
+            <div className="col-span-12">
+              {errors.paidByUserId && (
+                <p className="error-text">{errors.paidByUserId.message}</p>
+              )}
+              {errors.groupId && (
+                <p className="error-text">{errors.groupId.message}</p>
+              )}
+              {errors.participantUserIds && (
+                <p className="error-text">
+                  {"message" in errors.participantUserIds
+                    ? (errors.participantUserIds.message as string)
+                    : "Select the group participants."}
+                </p>
+              )}
+              {errors.splits && (
+                <p className="error-text">
+                  {"message" in errors.splits
+                    ? (errors.splits.message as string)
+                    : "Review split values."}
+                </p>
+              )}
+              {mutation.isError && (
+                <p className="error-text">{mutation.error.message}</p>
+              )}
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
   );
+}
+
+function getCategoryIcon(category: Category): string {
+  switch (category) {
+    case Category.FOOD:
+      return "restaurant";
+    case Category.TRANSPORT:
+      return "directions_car";
+    case Category.HOUSING:
+      return "home";
+    case Category.ENTERTAINMENT:
+      return "sports_esports";
+    case Category.HEALTH:
+      return "health_and_safety";
+    case Category.SHOPPING:
+      return "shopping_bag";
+    case Category.EDUCATION:
+      return "school";
+    case Category.UTILITIES:
+      return "bolt";
+    case Category.OTHER:
+      return "more_horiz";
+    default:
+      return "category";
+  }
 }

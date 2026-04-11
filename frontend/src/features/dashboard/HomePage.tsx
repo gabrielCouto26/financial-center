@@ -169,16 +169,16 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
           </nav>
 
           <div className="sidebar-footer">
-            <Button
-              variant="primary"
-              size="md"
-              icon={<IconPlus size={16} />}
-              className="w-full"
-              disabled
-              title="Transaction creation is not available on this screen yet."
-            >
-              New Expense
-            </Button>
+            <Link to="/new-expense" className="w-full">
+              <Button
+                variant="primary"
+                size="md"
+                icon={<IconPlus size={16} />}
+                className="w-full"
+              >
+                New Expense
+              </Button>
+            </Link>
           </div>
         </aside>
 

@@ -7,6 +7,7 @@ import { LoginPage } from './features/auth/LoginPage';
 import { RegisterPage } from './features/auth/RegisterPage';
 import { ComponentLab } from './features/dev/ComponentLab';
 import { PersonalPage } from './features/personal/PersonalPage';
+import { TransactionForm } from './features/transactions/TransactionForm';
 import { apiFetch, getStoredToken } from './services/api';
 
 import type { SafeUser } from './types/user';
@@ -75,6 +76,16 @@ export function App() {
         <Route
           path="/forgot-password"
           element={me ? <Navigate to="/dashboard" replace /> : <ForgotPasswordPage />}
+        />
+        <Route
+          path="/new-expense"
+          element={
+            <TransactionForm
+              user={me}
+              isLoading={Boolean(token) && isLoading}
+              hasToken={Boolean(token) && !isError}
+            />
+          }
         />
         <Route path="/dev/lab" element={<ComponentLab />} />
         <Route path="*" element={<Navigate to="/" replace />} />

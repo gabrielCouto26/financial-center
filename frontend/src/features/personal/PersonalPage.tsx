@@ -213,15 +213,16 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
           </nav>
 
           <div className="sidebar-footer">
-            <Button
-              variant="primary"
-              size="md"
-              icon={<IconPlus size={16} />}
-              className="w-full new-expense-btn"
-              disabled
-            >
-              New Expense
-            </Button>
+            <Link to="/new-expense" className="w-full">
+              <Button
+                variant="primary"
+                size="md"
+                icon={<IconPlus size={16} />}
+                className="w-full new-expense-btn"
+              >
+                New Expense
+              </Button>
+            </Link>
           </div>
         </aside>
 
