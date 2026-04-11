@@ -150,7 +150,7 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
           </div>
 
           <nav className="sidebar-nav">
-            <Link to="/" className={getNavItemClass('/')}>
+            <Link to="/dashboard" className={getNavItemClass('/dashboard')}>
               <IconDashboard size={20} />
               Dashboard
             </Link>

@@ -38,7 +38,7 @@ export function LoginPage() {
     onSuccess: (data) => {
       setStoredToken(data.accessToken);
       void queryClient.invalidateQueries({ queryKey: ['me'] });
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     },
   });
 

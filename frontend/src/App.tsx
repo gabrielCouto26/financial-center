@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { HomePage } from './features/dashboard/HomePage';
@@ -11,8 +12,15 @@ import { apiFetch, getStoredToken } from './services/api';
 import type { SafeUser } from './types/user';
 
 export function App() {
-  const token = getStoredToken();
-  const { data: me, isLoading } = useQuery({
+  const [token, setToken] = useState(getStoredToken());
+
+  useEffect(() => {
+    const handleAuth = () => setToken(getStoredToken());
+    window.addEventListener('auth-change', handleAuth);
+    return () => window.removeEventListener('auth-change', handleAuth);
+  }, []);
+
+  const { data: me, isLoading, isError } = useQuery({
     queryKey: ['me', token],
     queryFn: () => apiFetch<SafeUser>('/auth/me'),
     enabled: Boolean(token),
@@ -25,16 +33,30 @@ export function App() {
         <Route
           path="/"
           element={
+            me ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <HomePage
+                user={me}
+                isLoading={Boolean(token) && isLoading}
+                hasToken={Boolean(token) && !isError}
+              />
+            )
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
             <HomePage
               user={me}
               isLoading={Boolean(token) && isLoading}
-              hasToken={Boolean(token)}
+              hasToken={Boolean(token) && !isError}
             />
           }
         />
         <Route
           path="/login"
-          element={token ? <Navigate to="/" replace /> : <LoginPage />}
+          element={me ? <Navigate to="/dashboard" replace /> : <LoginPage />}
         />
         <Route
           path="/personal"
@@ -42,17 +64,17 @@ export function App() {
             <PersonalPage
               user={me}
               isLoading={Boolean(token) && isLoading}
-              hasToken={Boolean(token)}
+              hasToken={Boolean(token) && !isError}
             />
           }
         />
         <Route
           path="/register"
-          element={token ? <Navigate to="/" replace /> : <RegisterPage />}
+          element={me ? <Navigate to="/dashboard" replace /> : <RegisterPage />}
         />
         <Route
           path="/forgot-password"
-          element={token ? <Navigate to="/" replace /> : <ForgotPasswordPage />}
+          element={me ? <Navigate to="/dashboard" replace /> : <ForgotPasswordPage />}
         />
         <Route path="/dev/lab" element={<ComponentLab />} />
         <Route path="*" element={<Navigate to="/" replace />} />

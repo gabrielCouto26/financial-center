@@ -1,19 +1,19 @@
 # Estado do Projeto – Centro Financeiro Social
 
-> Última atualização: 2026-03-29
+> Última atualização: 2026-04-10
 > Branch: master
 
 ## Visão Geral
 
 O projeto é uma aplicação de gerenciamento financeiro monorepo com backend em NestJS (Prisma/PostgreSQL) e frontend em React (Vite/TypeScript). O foco é o controle de despesas pessoais, de casal e em grupo, com um design "Editorial Finance" de alta fidelidade ao Figma.
 
-Atualmente, o projeto concluiu a fundação de infraestrutura, autenticação, transações multi-contexto (pessoal/casal/grupo) e consolidou a base do redesign com um Design System atômico orientado por tokens.
+Atualmente, o projeto concluiu a fundação de infraestrutura, autenticação e redesign visual. Recentemente, foi corrigido um bug crítico de navegação no login onde tokens inválidos/expirados causavam loops de redirecionamento.
 
 ## Features Implementadas
 
 ### Fundação, Autenticação e Infraestrutura
-- **O que foi feito**: Setup do monorepo, backend NestJS, frontend React. Autenticação JWT completa, incluindo registro, login e fluxo de recuperação de senha. Padronização de workflows de agente (Research -> Strategy -> Execution).
-- **Arquivos principais**: `backend/src/auth/`, `frontend/src/features/auth/`, `~/.gemini/GEMINI.md`.
+- **O que foi feito**: Setup do monorepo, backend NestJS, frontend React. Autenticação JWT completa. Corrigido loop de redirecionamento no `/login` ao validar a sessão (presença do objeto `user`) em vez de apenas a existência do token no localStorage. `apiFetch` agora limpa o token automaticamente em caso de `401 Unauthorized`.
+- **Arquivos principais**: `backend/src/auth/`, `frontend/src/features/auth/`, `frontend/src/App.tsx`, `frontend/src/services/api.ts`.
 - **Notas**: Uso de Prisma para persistência e TanStack Query para estado do frontend.
 
 ### Transações Multi-Contexto (Épico 2, 3 e 4)

@@ -10,10 +10,12 @@ export function getStoredToken(): string | null {
 
 export function setStoredToken(token: string): void {
   localStorage.setItem(TOKEN_KEY, token);
+  window.dispatchEvent(new Event('auth-change'));
 }
 
 export function clearStoredToken(): void {
   localStorage.removeItem(TOKEN_KEY);
+  window.dispatchEvent(new Event('auth-change'));
 }
 
 type ApiErrorBody = {
@@ -44,6 +46,9 @@ export async function apiFetch<T>(
   }
   const data = (await res.json().catch(() => ({}))) as T & ApiErrorBody;
   if (!res.ok) {
+    if (res.status === 401) {
+      clearStoredToken();
+    }
     const msg = data.message;
     const text = Array.isArray(msg) ? msg.join(', ') : msg ?? res.statusText;
     throw new Error(text || 'Request failed');
