@@ -282,6 +282,7 @@ export class GroupsService {
     const netByGroupId = new Map<string, number>();
 
     for (const transaction of transactions) {
+      if (!transaction.groupId) continue;
       const amount = Number(transaction.amount);
       const signedAmount =
         transaction.direction === TransactionDirection.INCOME

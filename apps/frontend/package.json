@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "tokens:build": "node ./scripts/generate-css-tokens.mjs",
-    "prebuild": "npm run tokens:build",
+    "prebuild": "pnpm run tokens:build",
     "build": "vite build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --fix",
