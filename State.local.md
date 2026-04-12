@@ -31,7 +31,9 @@ Atualmente, o projeto concluiu a fundação de infraestrutura, autenticação e 
 
 ## Onde o Desenvolvimento Parou
 
-- **Concluído**: Refatoração visual da "Nova Despesa" para alta fidelidade.
+- **Concluído**: 
+  - Refatoração visual da "Nova Despesa" para alta fidelidade.
+  - Atualização da seção de Grupos no Dashboard para o estado "Em breve" (Coming Soon), ocultando dados parciais.
 - **Próximos passos**:
   1. Validar o fluxo completo de criação de transação com dados reais no frontend (testar submissão).
   2. Implementar feedback visual (Toasts) após a criação de transação.

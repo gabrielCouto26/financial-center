@@ -139,7 +139,6 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
 
     const balanceClassName =
       dashboard.summary.currentBalance < 0 ? 'danger' : 'success';
-    const groupsNetClassName = dashboard.groups.totalNet < 0 ? 'danger' : 'success';
     const userInitial = user.email.slice(0, 1).toUpperCase();
 
     return (
@@ -294,47 +293,14 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
 
               <Card className="groups-card">
                 <p className="card-title">Seus Grupos</p>
-                <div className="groups-list">
-                  {dashboard.groups.items.length > 0 ? (
-                    dashboard.groups.items.map((group) => (
-                      <div className="group-item" key={group.id}>
-                        <div className="group-avatar-icon">
-                          <IconUsers size={24} />
-                        </div>
-                        <div className="group-summary">
-                          <p className="group-name">{group.name}</p>
-                          <p className={`group-amount ${group.net < 0 ? 'danger' : 'success'}`}>
-                            {formatCurrency(group.net)}
-                          </p>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="group-item">
-                      <div className="group-avatar-icon">
-                        <IconUsers size={24} />
-                      </div>
-                      <div className="group-summary">
-                        <p className="group-name">Nenhum grupo ativo</p>
-                        <p className="group-meta">Crie um grupo para dividir despesas</p>
-                      </div>
-                    </div>
-                  )}
-                  <div className="group-item">
-                    <div className="group-avatar-icon">
-                      <IconUsers size={24} />
-                    </div>
-                    <div className="group-summary">
-                      <p className="group-name">Saldo agregado em grupos</p>
-                      <p className={`group-amount ${groupsNetClassName}`}>
-                        {formatCurrency(dashboard.groups.totalNet)}
-                      </p>
-                      <p className="group-meta">
-                        {dashboard.groups.groupCount}{' '}
-                        {dashboard.groups.groupCount === 1 ? 'grupo' : 'grupos'}
-                      </p>
-                    </div>
+                <div className="coming-soon-container">
+                  <div className="coming-soon-icon">
+                    <IconUsers size={48} />
                   </div>
+                  <h4 className="coming-soon-title">Em breve</h4>
+                  <p className="coming-soon-text">
+                    Estamos preparando uma experiência incrível para você gerenciar despesas em grupo.
+                  </p>
                 </div>
               </Card>
 
