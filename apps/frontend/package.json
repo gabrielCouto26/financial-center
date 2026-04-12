@@ -9,7 +9,7 @@
     "prebuild": "npm run tokens:build",
     "build": "vite build",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint .",
+    "lint": "eslint . --fix",
     "preview": "vite preview"
   },
   "dependencies": {

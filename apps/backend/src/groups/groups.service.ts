@@ -290,8 +290,8 @@ export class GroupsService {
 
       if (transaction.paidByUserId === userId) {
         netByGroupId.set(
-          transaction.groupId!,
-          (netByGroupId.get(transaction.groupId!) ?? 0) + signedAmount,
+          transaction.groupId,
+          (netByGroupId.get(transaction.groupId) ?? 0) + signedAmount,
         );
       }
 
@@ -300,8 +300,8 @@ export class GroupsService {
       );
       if (userSplit) {
         netByGroupId.set(
-          transaction.groupId!,
-          (netByGroupId.get(transaction.groupId!) ?? 0) -
+          transaction.groupId,
+          (netByGroupId.get(transaction.groupId) ?? 0) -
             signedAmount * (Number(userSplit.percentage) / 100),
         );
       }
