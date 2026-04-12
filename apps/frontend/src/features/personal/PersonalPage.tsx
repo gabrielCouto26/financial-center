@@ -202,10 +202,10 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
               <IconUser size={20} />
               Personal
             </Link>
-            <span className="nav-item nav-item--disabled" aria-disabled="true">
+            <Link to="/couple" className={getNavItemClass('/couple')}>
               <IconHeart size={20} />
               Couple
-            </span>
+            </Link>
             <span className="nav-item nav-item--disabled" aria-disabled="true">
               <IconUsers size={20} />
               Groups
