@@ -1,4 +1,4 @@
-# PRD — Centro Financeiro Social
+# PRD — Financial Center
 
 ## 1. Visão do Produto
 

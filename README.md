@@ -1,4 +1,4 @@
-# Centro Financeiro Social
+# Financial Center
 
 Monorepo layout: `backend/` (NestJS + Prisma + PostgreSQL), `frontend/` (Vite + React + TypeScript).
 
@@ -61,7 +61,7 @@ Open `http://localhost:5173`. Register or log in; the JWT is stored in **`localS
 
 ### UI and Dashboard
 
-The application features a modern "Editorial Finance" design:
+The application features a modern "Financial Center" design:
 - **Global Dashboard (`/`)**: Overview of all accounts (Personal, Couple, Groups) with aggregated balances and recent activity.
 - **Personal Page (`/personal`)**: Detailed breakdown of individual spending by category, monthly comparisons, and personal transaction history.
 - Both pages are fully integrated with real backend data from the `/dashboard` and `/transactions` endpoints.

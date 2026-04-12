@@ -1,11 +1,11 @@
-# Estado do Projeto – Centro Financeiro Social
+# Estado do Projeto – Financial Center
 
 > Última atualização: 2026-04-11
 > Branch: master
 
 ## Visão Geral
 
-O projeto é uma aplicação de gerenciamento financeiro monorepo com backend em NestJS (Prisma/PostgreSQL) e frontend em React (Vite/TypeScript). O foco é o controle de despesas pessoais, de casal e em grupo, com um design "Editorial Finance" de alta fidelidade ao Figma.
+O projeto é uma aplicação de gerenciamento financeiro monorepo com backend em NestJS (Prisma/PostgreSQL) e frontend em React (Vite/TypeScript). O foco é o controle de despesas pessoais, de casal e em grupo, com um design "Financial Center" de alta fidelidade ao Figma.
 
 Atualmente, o projeto concluiu a fundação de infraestrutura, autenticação e o roteamento da funcionalidade de "Nova Despesa", integrando o formulário de transações ao layout padrão da aplicação.
 
@@ -76,6 +76,6 @@ npm run typecheck:frontend
 ## Convenções e Padrões
 
 - **Padrão de Agente**: Research -> Strategy -> Execution.
-- **Interface**: "Editorial Finance" (Plus Jakarta Sans, Inter).
+- **Interface**: "Financial Center" (Plus Jakarta Sans, Inter).
 - **Código**: TypeScript; CSS focado em tokens.
 - **Roteamento**: Uso de `react-router-dom` com layout persistente em cada feature.

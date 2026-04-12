@@ -1,4 +1,4 @@
-# Backlog Técnico — Centro Financeiro Social
+# Backlog Técnico — Financial Center
 
 ## 1. Visão
 

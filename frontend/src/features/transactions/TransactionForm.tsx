@@ -371,7 +371,7 @@ export function TransactionForm({ user, isLoading, hasToken }: Props) {
     <div className="transaction-form-page">
       <aside className="sidebar">
         <div className="sidebar-logo">
-          <h1>Editorial Finance</h1>
+          <h1>Financial Center</h1>
         </div>
 
         <nav className="sidebar-nav">

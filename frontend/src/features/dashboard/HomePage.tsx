@@ -145,7 +145,7 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
       <div className="dashboard-page">
         <aside className="sidebar">
           <div className="sidebar-logo">
-            <h1>Editorial Finance</h1>
+            <h1>Financial Center</h1>
           </div>
 
           <nav className="sidebar-nav">
@@ -313,7 +313,7 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
 
   return (
     <div className="auth-landing">
-      <h1>Centro Financeiro Social</h1>
+      <h1>Financial Center</h1>
       <p>Manage your personal, couple, and group expenses.</p>
       <div className="auth-links">
         <Link to="/login">Login</Link>
