@@ -1,81 +1,82 @@
 # Estado do Projeto – Financial Center
 
-> Última atualização: 2026-04-11
+> Última atualização: 2026-04-12
 > Branch: master
 
 ## Visão Geral
 
-O projeto é uma aplicação de gerenciamento financeiro monorepo com backend em NestJS (Prisma/PostgreSQL) e frontend em React (Vite/TypeScript). O foco é o controle de despesas pessoais, de casal e em grupo, com um design "Financial Center" de alta fidelidade ao Figma.
+O projeto é uma aplicação de gerenciamento financeiro monorepo estruturada com **pnpm workspaces**. Consiste em um backend NestJS (Prisma/PostgreSQL) e um frontend React (Vite/TypeScript), ambos localizados dentro do diretório `apps/`. O objetivo é o controle de despesas pessoais, de casal e em grupo, com um design premium e alta fidelidade.
 
-Atualmente, o projeto concluiu a fundação de infraestrutura, autenticação e o roteamento da funcionalidade de "Nova Despesa", integrando o formulário de transações ao layout padrão da aplicação.
+Recentemente, o projeto foi migrado para **pnpm**, consolidando a estrutura de monorepo e incluindo automação de CI/CD via GitHub Actions.
 
 ## Features Implementadas
 
-### Fundação, Autenticação e Infraestrutura
-- **O que foi feito**: Setup do monorepo, backend NestJS, frontend React. Autenticação JWT completa. Corrigido loop de redirecionamento no `/login` ao validar a sessão. `apiFetch` limpa o token em caso de `401`.
-- **Arquivos principais**: `backend/src/auth/`, `frontend/src/features/auth/`, `frontend/src/App.tsx`, `frontend/src/services/api.ts`.
+### Infraestrutura e Monorepo (pnpm)
+- **O que foi feito**: Migração completa para `pnpm workspaces`. Reorganização dos módulos para `apps/backend` e `apps/frontend`. Configuração de scripts globais no root para linting, testes e build.
+- **Arquivos principais**: `pnpm-workspace.yaml`, `package.json` (root), `apps/`.
 
-### Transações Multi-Contexto (Épico 2, 3 e 4)
-- **O que foi feito**: Modelagem e implementação de transações Pessoais, de Casal e de Grupo. Endpoints de balanço e resumo agregados.
-- **Arquivos principais**: `backend/src/transactions/`, `backend/src/couple/`, `backend/src/groups/`.
-- **Atualização recente**: `/transactions` exige `direction` (INCOME/EXPENSE), oferece pesquisa e filtros. Dashboard consome dados reais.
+### CI/CD e Qualidade
+- **O que foi feito**: Implementação de workflow de CI no GitHub Actions (`.github/workflows/ci.yml`) que executa lint, typecheck, testes de backend e build em cada PR ou Push para a branch `master`.
+- **Arquivos principais**: `.github/workflows/ci.yml`, `.gitignore` (ajustado para permitir `pnpm-lock.yaml`).
 
-### Layout e Roteamento "Nova Despesa" (Épico 5 - Refinado)
-- **O que foi feito**: Unificação do `TransactionForm` com o layout padrão. Refatoração completa da UI para fidelidade "pixel-perfect" com o Stitch (`nova_despesa.html`). Implementados cálculos dinâmicos de split em moeda local, grid responsivo para valor/data, prefixo de moeda estilizado e toggle de tipo "Pill/Tab".
-- **Arquivos principais**: `frontend/src/features/transactions/TransactionForm.tsx`, `frontend/src/features/transactions/TransactionForm.css`.
-- **Notas**: O formulário agora redireciona de volta após o sucesso e suporta cancelamento via navegação com feedback visual premium nos botões.
+### Transações e Layout "Nova Despesa"
+- **O que foi feito**: Implementação de transações nos contextos Pessoal, Casal e Grupo. UI de "Nova Despesa" com fidelidade pixel-perfect ao Stitch, incluindo cálculos dinâmicos de split e layout responsivo.
+- **Arquivos principais**: `apps/frontend/src/features/transactions/`, `apps/backend/src/transactions/`.
 
-### Design System e Redesign de Páginas (Épico 5)
-- **O que foi feito**: Implementação de tokens de design, componentes atômicos e biblioteca de ícones. Redesign total da `HomePage` e `PersonalPage`.
-- **Arquivos principais**: `frontend/src/design-system/`, `frontend/src/features/dashboard/HomePage.tsx`, `frontend/src/features/personal/PersonalPage.tsx`.
+### Design System e Redesign
+- **O que foi feito**: Implementação de tokens de design e componentes atômicos. Redesign total da `HomePage` e `PersonalPage`.
+- **Arquivos principais**: `apps/frontend/src/design-system/`, `apps/frontend/src/features/dashboard/`.
 
 ## Onde o Desenvolvimento Parou
 
 - **Concluído**: 
-  - Refatoração visual da "Nova Despesa" para alta fidelidade.
-  - Atualização da seção de Grupos no Dashboard para o estado "Em breve" (Coming Soon), ocultando dados parciais.
+  - Migração para pnpm e configuração de workspace.
+  - Setup do Workflow de CI (Build, Lint, Test).
+  - Ajuste de permissões de arquivo no Git (`pnpm-lock.yaml`).
+- **In progress**:
+  - Implementação da página de Finanças em Conjunto ("Couple").
 - **Próximos passos**:
-  1. Validar o fluxo completo de criação de transação com dados reais no frontend (testar submissão).
-  2. Implementar feedback visual (Toasts) após a criação de transação.
-  3. Expandir filtros e paginação na IU para listas de transações.
-  4. Ativar testes end-to-end para o fluxo de nova despesa.
+  1. Validar a execução da pipeline de CI no GitHub com os commits mais recentes.
+  2. Implementar a lógica de integração dos endpoints `/couple` e `/couple/balance` na nova UI de casal.
+  3. Adicionar feedback visual (Toasts) após ações de sucesso no formulário.
+  4. Finalizar a implementação da página de Grupos.
 
 ## Endpoints / APIs (Estado Atual)
 
 - **Implementados**: 
-  - `POST /auth/register`, `/login`, `/forgot-password`, `/reset-password`.
+  - `POST /auth/register`, `/login`.
   - `POST/GET /transactions`.
-  - `POST/GET /couple`, `/groups`, `/groups/:id/balance`.
+  - `POST/GET /couple`, `/groups`.
   - `GET /dashboard` (Real).
 
 ## Estrutura de Arquivos Relevantes
 
 ```text
 /
-├── backend/src/       # NestJS Modules
-├── frontend/src/
-│   ├── design-system/ # Atomic Components, tokens
-│   ├── features/      # Business features (dashboard, personal, transactions)
-│   ├── App.tsx        # Routing & Layout
-│   └── index.css      # Style Resets
-└── docs/              # PRD, Guidelines
+├── apps/
+│   ├── backend/       # NestJS + Prisma
+│   └── frontend/      # Vite + React
+├── .github/workflows/ # GitHub Actions (CI)
+├── pnpm-workspace.yaml
+├── State.local.md     # Este arquivo
+└── docs/              # Backlog e Guias
 ```
 
 ## Useful Commands
 
 ```bash
-# Iniciar ambiente de desenvolvimento
-cd backend && npm run start:dev
-cd frontend && npm run dev
+# Instalação (Monorepo)
+pnpm install
 
-# Verificações
-npm run lint:frontend
-npm run typecheck:frontend
+# Verificações Globais
+pnpm lint:all
+pnpm test:all
+pnpm build
 ```
 
 ## Convenções e Padrões
 
 - **Padrão de Agente**: Research -> Strategy -> Execution.
-- **Interface**: "Financial Center" (Plus Jakarta Sans, Inter).
-- **Código**: TypeScript; CSS focado em tokens.
-- **Roteamento**: Uso de `react-router-dom` com layout persistente em cada feature.
+- **Package Manager**: `pnpm` (essencial manter o `pnpm-lock.yaml` commitado).
+- **CI/CD**: Toda alteração na `master` ou PR deve passar no workflow definido em `.github/workflows/ci.yml`.
+- **Código**: TypeScript obrigatório; CSS focado em tokens do Design System.
