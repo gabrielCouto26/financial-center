@@ -1,1 +1,3 @@
-npm test
+pnpm build
+pnpm lint:all
+pnpm test:all
