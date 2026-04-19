@@ -360,30 +360,36 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
               <div className="activity-list">
                 {personalRecentTransactions.length > 0 ? (
                   personalRecentTransactions.map((tx) => (
-                    <div key={tx.id} className="activity-item">
-                      <div className="activity-icon">
-                        {categoryIcons[tx.category] || <IconDashboard size={20} />}
-                      </div>
-                      <div className="activity-content">
-                        <p className="activity-name">{tx.name}</p>
-                        <div className="activity-meta">
-                          <span className="activity-date">
-                            {formatTransactionDate(tx.date)}
-                          </span>
-                          <Badge variant="success" pill>
-                            {categoryLabels[tx.category]}
-                          </Badge>
+                    <Link
+                      key={tx.id}
+                      to={`/edit-expense/${tx.id}`}
+                      className="activity-item-link"
+                    >
+                      <div className="activity-item">
+                        <div className="activity-icon">
+                          {categoryIcons[tx.category] || <IconDashboard size={20} />}
+                        </div>
+                        <div className="activity-content">
+                          <p className="activity-name">{tx.name}</p>
+                          <div className="activity-meta">
+                            <span className="activity-date">
+                              {formatTransactionDate(tx.date)}
+                            </span>
+                            <Badge variant="success" pill>
+                              {categoryLabels[tx.category]}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="activity-amount-group">
+                          <p className="activity-amount">
+                            - {formatCurrency(Number(tx.amount))}
+                          </p>
+                          <p className="activity-source">
+                            {getTransactionSourceLabel(tx.type)}
+                          </p>
                         </div>
                       </div>
-                      <div className="activity-amount-group">
-                        <p className="activity-amount">
-                          - {formatCurrency(Number(tx.amount))}
-                        </p>
-                        <p className="activity-source">
-                          {getTransactionSourceLabel(tx.type)}
-                        </p>
-                      </div>
-                    </div>
+                    </Link>
                   ))
                 ) : (
                   <Card className="summary-empty-card">

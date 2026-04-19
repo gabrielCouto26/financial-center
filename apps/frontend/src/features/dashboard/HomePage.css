@@ -397,6 +397,21 @@
   gap: var(--ds-spacing-4);
 }
 
+.transaction-item-link {
+  text-decoration: none;
+  display: block;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.transaction-item-link:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.02);
+}
+
+.transaction-item-link:active {
+  transform: translateY(0);
+}
+
 .transaction-item-card {
   display: flex !important;
   align-items: center !important;

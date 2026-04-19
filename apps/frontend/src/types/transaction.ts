@@ -56,6 +56,8 @@ export interface CreateTransactionRequest {
   splits?: TransactionSplit[];
 }
 
+export type UpdateTransactionRequest = Partial<CreateTransactionRequest>;
+
 export interface PaginatedTransactions {
   items: Transaction[];
   page: number;
