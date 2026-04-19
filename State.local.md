@@ -1,6 +1,6 @@
 # Project State – Financial Center
 
-> Última atualização: 2026-04-12
+> Última atualização: 2026-04-19
 > Branch: feature/couple-ui
 
 ## Overview
@@ -37,6 +37,10 @@ As of this session, the project has a fully functional CI/CD pipeline (GitHub Ac
 ### Design System & Global Layout
 - **What was done**: Atomic components (Button, Card, Input) and design tokens (colors, typography) in a shared design-system folder. High-fidelity redesign of `HomePage` and `PersonalPage` with Vanilla CSS.
 - **Main files**: `apps/frontend/src/design-system/`, `apps/frontend/src/features/dashboard/HomePage.tsx`, `apps/frontend/src/features/personal/PersonalPage.tsx`.
+### Dependency Remediation & Vulnerability Fixes (Stages 1-4)
+- **What was done**: Resolved all advisory-backed findings (`hono`, `@hono/node-server`) via `pnpm.overrides`. Performed non-breaking patch and minor upgrades across root, backend, and frontend. Aligned `@types/node` versions between workspaces.
+- **Main files**: `package.json` (root), `apps/backend/package.json`, `apps/frontend/package.json`, `pnpm-lock.yaml`.
+- **Note**: `pnpm audit` now reports zero vulnerabilities. Major breaking upgrades (ESLint 10, TypeScript 6, Vite 8, Zod 4) are scheduled as isolated future tasks.
 
 ### Couple Finance Page (feature/couple-ui — staged, not merged)
 - **What was done**: Full replacement of the legacy `CouplePanel.tsx` with a bento-grid `CouplePage`. Integrates `/couple` and `/couple/balance` API endpoints via React Query. Granular sub-components created:
