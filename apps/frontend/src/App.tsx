@@ -8,7 +8,8 @@ import { RegisterPage } from './features/auth/RegisterPage';
 import { ComponentLab } from './features/dev/ComponentLab';
 import { PersonalPage } from './features/personal/PersonalPage';
 import { CouplePage } from './features/couple/CouplePage';
-import { TransactionForm } from './features/transactions/TransactionForm';
+import { NewTransactionPage } from './features/transactions/NewTransactionPage';
+import { EditTransactionPage } from './features/transactions/EditTransactionPage';
 import { apiFetch, getStoredToken } from './services/api';
 
 import type { SafeUser } from './types/user';
@@ -91,7 +92,17 @@ export function App() {
         <Route
           path="/new-expense"
           element={
-            <TransactionForm
+            <NewTransactionPage
+              user={me}
+              isLoading={Boolean(token) && isLoading}
+              hasToken={Boolean(token) && !isError}
+            />
+          }
+        />
+        <Route
+          path="/edit-expense/:id"
+          element={
+            <EditTransactionPage
               user={me}
               isLoading={Boolean(token) && isLoading}
               hasToken={Boolean(token) && !isError}

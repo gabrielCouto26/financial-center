@@ -53,6 +53,11 @@ As of this session, the project has a fully functional CI/CD pipeline (GitHub Ac
 - **Main files**: `apps/frontend/src/features/couple/CouplePage.tsx`, `apps/frontend/src/features/couple/CouplePage.css`, `apps/frontend/src/features/couple/components/`.
 - **Note**: `App.tsx` updated to route `/couple` → `<CouplePage>`. The old `CouplePanel.tsx` is still present but superseded.
 
+### Expense Edition Feature
+- **What was done**: Implemented fullstack capability to edit existing transactions. Added `GET /transactions/:id` and `PUT /transactions/:id` endpoints in the backend and a new `EditTransactionForm` screen in the frontend. Reused existing design tokens and `TransactionForm` structure.
+- **Main files**: `apps/backend/src/transactions/`, `apps/frontend/src/features/transactions/EditTransactionForm.tsx`, `apps/frontend/src/App.tsx`.
+- **Note**: The edit screen is accessible via `/edit-expense/:id` and mimics the "New Expense" UI.
+
 ## Where Development Stopped
 
 - **In Progress**:
@@ -73,7 +78,7 @@ As of this session, the project has a fully functional CI/CD pipeline (GitHub Ac
 
 - **Implemented**:
   - Auth: `POST /auth/register`, `/auth/login`, `/auth/forgot-password`, `/auth/reset-password`, `GET /auth/me`.
-  - Transactions: `POST /transactions`, `GET /transactions` (with query filters: direction, category).
+  - Transactions: `POST /transactions`, `GET /transactions`, `GET /transactions/:id`, `PUT /transactions/:id`.
   - Couple: `POST /couple/link`, `GET /couple`, `GET /couple/balance`.
   - Groups: `POST /groups`, `GET /groups`, `GET /groups/:id/balance`.
   - Dashboard: `GET /dashboard`.

@@ -253,35 +253,41 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
                 <div className="transactions-list">
                   {dashboard.recentTransactions.length > 0 ? (
                     dashboard.recentTransactions.map((tx) => (
-                      <Card key={tx.id} className="transaction-item-card">
-                        <div
-                          className={`transaction-icon-wrapper ${
-                            tx.direction === TransactionDirection.INCOME
-                              ? 'transaction-icon--income'
-                              : 'transaction-icon--expense'
-                          }`}
-                        >
-                          {categoryIcons[tx.category]}
-                        </div>
-                        <div className="transaction-details">
-                          <p className="transaction-name">{tx.name}</p>
-                          <p className="transaction-meta">
-                            {categoryLabels[tx.category]} • {formatTransactionDate(tx.date)}
-                          </p>
-                        </div>
-                        <div className="transaction-amount-block">
-                          <p
-                            className={`transaction-amount ${
-                              tx.direction === TransactionDirection.INCOME ? 'success' : 'danger'
+                      <Link
+                        key={tx.id}
+                        to={`/edit-expense/${tx.id}`}
+                        className="transaction-item-link"
+                      >
+                        <Card className="transaction-item-card">
+                          <div
+                            className={`transaction-icon-wrapper ${
+                              tx.direction === TransactionDirection.INCOME
+                                ? 'transaction-icon--income'
+                                : 'transaction-icon--expense'
                             }`}
                           >
-                            {formatCurrency(Number(tx.amount))}
-                          </p>
-                          <p className="transaction-source">
-                            {getTransactionSourceLabel(tx.type, tx.direction)}
-                          </p>
-                        </div>
-                      </Card>
+                            {categoryIcons[tx.category]}
+                          </div>
+                          <div className="transaction-details">
+                            <p className="transaction-name">{tx.name}</p>
+                            <p className="transaction-meta">
+                              {categoryLabels[tx.category]} • {formatTransactionDate(tx.date)}
+                            </p>
+                          </div>
+                          <div className="transaction-amount-block">
+                            <p
+                              className={`transaction-amount ${
+                                tx.direction === TransactionDirection.INCOME ? 'success' : 'danger'
+                              }`}
+                            >
+                              {formatCurrency(Number(tx.amount))}
+                            </p>
+                            <p className="transaction-source">
+                              {getTransactionSourceLabel(tx.type, tx.direction)}
+                            </p>
+                          </div>
+                        </Card>
+                      </Link>
                     ))
                   ) : (
                     <Card className="empty-card">
