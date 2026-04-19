@@ -539,31 +539,31 @@ export function TransactionForm({
         {/* Paid By & Direction */}
         <div className="form-card">
           <div className="transaction-form-sidebar-stack">
-            <div className="input-group">
-              <label>Who Paid</label>
-              <select
-                className="input-field"
-                {...register("paidByUserId")}
-              >
-                {type === TransactionType.PERSONAL ? (
-                  <option value={currentUserId}>Me</option>
-                ) : type === TransactionType.COUPLE ? (
-                  coupleMembers.map((member) => (
-                    <option key={member.id} value={member.id}>
-                      {member.id === currentUserId
-                        ? "Me"
-                        : couple?.partner.email}
-                    </option>
-                  ))
-                ) : (
-                  groupMembers.map((member) => (
-                    <option key={member.id} value={member.id}>
-                      {member.id === currentUserId ? "Me" : member.email}
-                    </option>
-                  ))
-                )}
-              </select>
-            </div>
+            {type !== TransactionType.PERSONAL && (
+              <div className="input-group">
+                <label>Who Paid</label>
+                <select
+                  className="input-field"
+                  {...register("paidByUserId")}
+                >
+                  {type === TransactionType.COUPLE ? (
+                    coupleMembers.map((member) => (
+                      <option key={member.id} value={member.id}>
+                        {member.id === currentUserId
+                          ? "Me"
+                          : couple?.partner.email}
+                      </option>
+                    ))
+                  ) : (
+                    groupMembers.map((member) => (
+                      <option key={member.id} value={member.id}>
+                        {member.id === currentUserId ? "Me" : member.email}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+            )}
 
             <div className="input-group">
               <label>Type</label>
