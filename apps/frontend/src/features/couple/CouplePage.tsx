@@ -92,7 +92,7 @@ export function CouplePage({ user, isLoading }: Props) {
         </nav>
 
         <div className="sidebar-footer">
-          <Link to="/new-expense" className="w-full">
+          <Link to="/expense/new" className="w-full">
             <Button
               variant="primary"
               size="md"
@@ -144,7 +144,7 @@ export function CouplePage({ user, isLoading }: Props) {
       </main>
 
       {/* FAB */}
-      <Link to="/new-expense" className="couple-fab">
+      <Link to="/expense/new" className="couple-fab">
         <IconPlus size={18} />
         + Despesa de Casal
       </Link>

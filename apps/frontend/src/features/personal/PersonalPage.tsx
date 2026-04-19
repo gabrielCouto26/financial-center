@@ -213,7 +213,7 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
           </nav>
 
           <div className="sidebar-footer">
-            <Link to="/new-expense" className="w-full">
+            <Link to="/expense/new" className="w-full">
               <Button
                 variant="primary"
                 size="md"
@@ -362,7 +362,7 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
                   personalRecentTransactions.map((tx) => (
                     <Link
                       key={tx.id}
-                      to={`/edit-expense/${tx.id}`}
+                      to={`/expense/edit/${tx.id}`}
                       className="activity-item-link"
                     >
                       <div className="activity-item">

@@ -90,7 +90,7 @@ export function App() {
           element={me ? <Navigate to="/dashboard" replace /> : <ForgotPasswordPage />}
         />
         <Route
-          path="/new-expense"
+          path="/expense/new"
           element={
             <NewTransactionPage
               user={me}
@@ -100,7 +100,7 @@ export function App() {
           }
         />
         <Route
-          path="/edit-expense/:id"
+          path="/expense/edit/:id"
           element={
             <EditTransactionPage
               user={me}
