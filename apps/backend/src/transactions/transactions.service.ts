@@ -12,6 +12,7 @@ import {
   CreateTransactionDto,
   CreateTransactionSplitDto,
 } from './dto/create-transaction.dto';
+import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { ListTransactionsQueryDto } from './dto/list-transactions-query.dto';
 
 type TransactionRecord = Prisma.TransactionGetPayload<{
@@ -113,6 +114,72 @@ export class TransactionsService {
       totalItems,
       totalPages: totalItems === 0 ? 0 : Math.ceil(totalItems / pageSize),
     };
+  }
+
+  async findOne(
+    userId: string,
+    transactionId: string,
+  ): Promise<TransactionResponse> {
+    const where = await this.buildAccessibleWhere(userId);
+    const transaction = await this.prisma.transaction.findFirst({
+      where: {
+        AND: [where, { id: transactionId }],
+      },
+      include: {
+        splits: {
+          orderBy: { createdAt: 'asc' },
+        },
+        group: true,
+      },
+    });
+
+    if (!transaction) {
+      throw new BadRequestException('Transaction not found or access denied');
+    }
+
+    return this.mapToResponse(transaction);
+  }
+
+  async update(
+    userId: string,
+    transactionId: string,
+    dto: UpdateTransactionDto,
+  ): Promise<TransactionResponse> {
+    await this.findOne(userId, transactionId);
+
+    const updateData: Prisma.TransactionUpdateInput = {
+      name: dto.name,
+      amount: dto.amount,
+      category: dto.category,
+      direction: dto.direction,
+      date: dto.date ? new Date(dto.date) : undefined,
+      payer: dto.paidByUserId
+        ? { connect: { id: dto.paidByUserId } }
+        : undefined,
+    };
+
+    if (dto.splits) {
+      updateData.splits = {
+        deleteMany: {},
+        create: dto.splits.map((split) => ({
+          userId: split.userId,
+          percentage: split.percentage,
+        })),
+      };
+    }
+
+    const transaction = await this.prisma.transaction.update({
+      where: { id: transactionId },
+      data: updateData,
+      include: {
+        splits: {
+          orderBy: { createdAt: 'asc' },
+        },
+        group: true,
+      },
+    });
+
+    return this.mapToResponse(transaction);
   }
 
   async findRecentAccessibleByUser(

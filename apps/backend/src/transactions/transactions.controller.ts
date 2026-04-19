@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   PaginatedTransactionsResponse,
@@ -6,6 +15,7 @@ import {
   TransactionResponse,
 } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { SafeUser } from '../users/users.service';
 import { ListTransactionsQueryDto } from './dto/list-transactions-query.dto';
@@ -30,5 +40,24 @@ export class TransactionsController {
     @Query() query: ListTransactionsQueryDto,
   ): Promise<PaginatedTransactionsResponse> {
     return this.transactionsService.listAccessibleByUser(user.id, query);
+  }
+
+  @Get(':id')
+  @UseGuards(AuthGuard('jwt'))
+  async findOne(
+    @CurrentUser() user: SafeUser,
+    @Param('id') id: string,
+  ): Promise<TransactionResponse> {
+    return this.transactionsService.findOne(user.id, id);
+  }
+
+  @Put(':id')
+  @UseGuards(AuthGuard('jwt'))
+  async update(
+    @CurrentUser() user: SafeUser,
+    @Param('id') id: string,
+    @Body() dto: UpdateTransactionDto,
+  ): Promise<TransactionResponse> {
+    return this.transactionsService.update(user.id, id, dto);
   }
 }
