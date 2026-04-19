@@ -272,7 +272,7 @@ export function TransactionForm({
       {/* Main Content Area */}
       <div className="transaction-form-main">
         <div className="form-card">
-          <div className="flex flex-col gap-8">
+          <div className="transaction-form-card-stack">
             {/* Transaction Name */}
             <div
               className={`input-group ${errors.name ? "field-error" : ""}`}
@@ -511,7 +511,7 @@ export function TransactionForm({
       <aside className="transaction-form-aside">
         {/* Category Selector */}
         <div className="form-card">
-          <label className="block text-sm font-bold text-on-surface-variant mb-6 uppercase tracking-[0.1em]">
+          <label className="transaction-form-category-label">
             Category
           </label>
           <div className="category-grid">
@@ -538,9 +538,9 @@ export function TransactionForm({
 
         {/* Paid By & Direction */}
         <div className="form-card">
-          <div className="space-y-6">
+          <div className="transaction-form-sidebar-stack">
             <div className="input-group">
-              <label className="tracking-[0.1em]">Who Paid</label>
+              <label>Who Paid</label>
               <select
                 className="input-field"
                 {...register("paidByUserId")}
@@ -593,7 +593,7 @@ export function TransactionForm({
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col gap-4">
+        <div className="transaction-form-actions">
           <button
             type="submit"
             className="submit-btn"
@@ -612,7 +612,7 @@ export function TransactionForm({
       </aside>
 
       {/* Global Errors */}
-      <div className="col-span-12">
+      <div className="transaction-form-global-errors">
         {errors.paidByUserId && (
           <p className="error-text">{errors.paidByUserId.message}</p>
         )}
