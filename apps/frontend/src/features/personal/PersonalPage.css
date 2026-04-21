@@ -1,16 +1,12 @@
-.personal-body {
-  padding: 40px 60px;
-  max-width: 900px;
-  width: 100%;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-}
-
 .hero-section {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: var(--ds-spacing-6);
+  padding: var(--ds-spacing-6);
+  background-color: var(--ds-colors-background-surface);
+  border-radius: var(--ds-components-card-radius);
+  box-shadow: var(--ds-components-card-shadow);
   margin-bottom: var(--ds-spacing-8);
 }
 
@@ -25,10 +21,10 @@
 
 .hero-balance {
   font-family: var(--ds-typography-fontFamily-display);
-  font-size: 56px;
-  font-weight: 800;
-  color: #1a1a1a;
-  line-height: 1;
+  font-size: var(--ds-typography-fontSize-48);
+  font-weight: var(--ds-typography-fontWeight-extrabold);
+  color: var(--ds-colors-text-brandStrong);
+  line-height: var(--ds-typography-lineHeight-compact);
   margin: 0;
   letter-spacing: -0.02em;
 }
@@ -74,9 +70,9 @@
 }
 
 .summary-card-amount {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1a1a1a;
+  font-size: var(--ds-typography-fontSize-24);
+  font-weight: var(--ds-typography-fontWeight-bold);
+  color: var(--ds-colors-text-strong);
 }
 
 .summary-card-footer {
@@ -91,8 +87,8 @@
 }
 
 .summary-card-subtext {
-  font-size: 11px;
-  color: #999;
+  font-size: var(--ds-typography-fontSize-11);
+  color: var(--ds-colors-text-muted);
   display: flex;
   justify-content: flex-end;
 }
@@ -126,10 +122,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
-  background-color: #f1f4f9;
-  border-radius: 20px;
-  margin-bottom: 40px;
+  gap: var(--ds-spacing-6);
+  padding: var(--ds-spacing-4) var(--ds-spacing-6);
+  background-color: var(--ds-colors-background-subtle);
+  border: 1px solid var(--ds-colors-border-default);
+  border-radius: var(--ds-radius-2xl);
+  margin-bottom: var(--ds-spacing-8);
 }
 
 .secondary-items {
@@ -158,24 +156,35 @@
 .avatar-stack {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--ds-spacing-1);
 }
 
 .avatar-capsule {
-  width: 28px;
-  height: 28px;
-  border-radius: 14px;
+  width: var(--ds-size-avatar-stack);
+  height: var(--ds-size-avatar-stack);
+  border-radius: var(--ds-radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 8px;
   font-weight: 800;
-  color: #fff;
+  letter-spacing: 0.08em;
 }
 
-.bg-blue-mid { background-color: #8faadd; }
-.bg-green-mid { background-color: #a7d7c1; }
-.bg-orange-mid { background-color: #f3d0b0; }
+.bg-blue-mid {
+  background-color: var(--ds-colors-background-info);
+  color: var(--ds-colors-text-info);
+}
+
+.bg-green-mid {
+  background-color: var(--ds-colors-background-success);
+  color: var(--ds-colors-text-successStrong);
+}
+
+.bg-orange-mid {
+  background-color: var(--ds-colors-background-warning);
+  color: var(--ds-colors-text-warning);
+}
 
 .section-header {
   display: flex;
@@ -220,12 +229,12 @@
 
 .activity-item {
   background-color: var(--ds-colors-background-surface);
-  border-radius: var(--ds-radius-xl);
+  border-radius: var(--ds-components-transactionItem-radius);
   padding: var(--ds-spacing-4) var(--ds-spacing-6);
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-5);
-  box-shadow: var(--ds-shadows-soft);
+  box-shadow: var(--ds-components-transactionItem-shadow);
 }
 
 .activity-icon {
@@ -329,6 +338,7 @@
   height: 100vh;
   font-family: var(--ds-typography-fontFamily-primary);
   color: var(--ds-colors-text-secondary);
+  background-color: var(--ds-colors-background-canvas);
 }
 
 .auth-landing {
@@ -348,4 +358,34 @@
 .ds-button.w-full {
   display: flex;
   width: 100%;
+}
+
+@media (max-width: 768px) {
+  .hero-section,
+  .secondary-summary {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-balance {
+    font-size: var(--ds-typography-fontSize-32);
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .secondary-items {
+    flex-wrap: wrap;
+    gap: var(--ds-spacing-4);
+  }
+
+  .activity-item {
+    flex-wrap: wrap;
+  }
+
+  .activity-amount-group {
+    width: 100%;
+    text-align: left;
+  }
 }

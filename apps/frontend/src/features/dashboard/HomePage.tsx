@@ -24,6 +24,7 @@ import {
   TransactionType,
 } from '../../types/transaction';
 import type { SafeUser } from '../../types/user';
+import { AuthenticatedPage } from '../../layout/AuthenticatedPage';
 
 type Props = {
   user?: SafeUser;
@@ -115,16 +116,16 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
   }
 
   if (isLoading) {
-    return <div className="loading-state">Loading…</div>;
+    return <div className="loading-state">Carregando sessão…</div>;
   }
 
   if (hasToken && user) {
     if (isDashboardLoading) {
-      return <div className="loading-state">Loading dashboard…</div>;
+      return <div className="loading-state">Carregando painel…</div>;
     }
 
     if (isError || !dashboard) {
-      return <div className="loading-state">Unable to load dashboard.</div>;
+      return <div className="loading-state">Não foi possível carregar o painel.</div>;
     }
 
     const balanceClassName =
@@ -132,8 +133,12 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
 
     return (
       <DashboardLayout user={user} activePath="/dashboard">
-        <div className="dashboard-body">
-            <div className="dashboard-grid">
+        <AuthenticatedPage
+          eyebrow="Painel"
+          title="Visão geral"
+          description="Acompanhe seu saldo, os ajustes do casal e as transações mais recentes em um só lugar."
+        >
+          <div className="dashboard-grid">
               <Card className="balance-card">
                 <div className="balance-header">
                   <p className="card-title">SALDO DISPONÍVEL</p>
@@ -240,9 +245,8 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
                   </p>
                 </div>
               </Card>
-
-            </div>
-        </div>
+          </div>
+        </AuthenticatedPage>
       </DashboardLayout>
     );
   }

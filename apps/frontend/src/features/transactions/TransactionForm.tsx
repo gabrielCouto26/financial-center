@@ -232,15 +232,15 @@ export function TransactionForm({
   }
 
   const categoryLabels: Record<Category, string> = {
-    [Category.FOOD]: "Food",
-    [Category.TRANSPORT]: "Transport",
-    [Category.HOUSING]: "Housing",
-    [Category.ENTERTAINMENT]: "Leisure",
-    [Category.HEALTH]: "Health",
-    [Category.SHOPPING]: "Shopping",
-    [Category.EDUCATION]: "Education",
-    [Category.UTILITIES]: "Utilities",
-    [Category.OTHER]: "Other",
+    [Category.FOOD]: "Alimentação",
+    [Category.TRANSPORT]: "Transporte",
+    [Category.HOUSING]: "Moradia",
+    [Category.ENTERTAINMENT]: "Lazer",
+    [Category.HEALTH]: "Saúde",
+    [Category.SHOPPING]: "Compras",
+    [Category.EDUCATION]: "Educação",
+    [Category.UTILITIES]: "Serviços",
+    [Category.OTHER]: "Outros",
   };
 
   const formatCurrency = (val: number) => {
@@ -269,19 +269,17 @@ export function TransactionForm({
       onSubmit={handleSubmit((values) => onSubmit(toRequest(values)))}
       className="transaction-form-grid"
     >
-      {/* Main Content Area */}
       <div className="transaction-form-main">
         <div className="form-card">
           <div className="transaction-form-card-stack">
-            {/* Transaction Name */}
             <div
               className={`input-group ${errors.name ? "field-error" : ""}`}
             >
-              <label>Transaction Name</label>
+              <label>Nome da transação</label>
               <input
                 type="text"
                 className="input-field"
-                placeholder="e.g. Weekly Groceries"
+                placeholder="Ex.: compras da semana"
                 {...register("name")}
               />
               {errors.name && (
@@ -289,12 +287,11 @@ export function TransactionForm({
               )}
             </div>
 
-            {/* Amount and Date Row */}
             <div className="form-row">
               <div
                 className={`input-group ${errors.amount ? "field-error" : ""}`}
               >
-                <label>Amount</label>
+                <label>Valor</label>
                 <div className="amount-input-container">
                   <span className="currency-prefix">R$</span>
                   <input
@@ -313,7 +310,7 @@ export function TransactionForm({
               <div
                 className={`input-group ${errors.date ? "field-error" : ""}`}
               >
-                <label>Date</label>
+                <label>Data</label>
                 <div className="date-input-container">
                   <input
                     type="date"
@@ -332,7 +329,6 @@ export function TransactionForm({
           </div>
         </div>
 
-        {/* Type Toggle */}
         <div className="type-toggle">
           <button
             type="button"
@@ -340,7 +336,7 @@ export function TransactionForm({
             onClick={() => setValue("type", TransactionType.PERSONAL)}
           >
             <span className="material-symbols-outlined">person</span>
-            Personal
+            Pessoal
           </button>
           <button
             type="button"
@@ -349,7 +345,7 @@ export function TransactionForm({
             onClick={() => setValue("type", TransactionType.COUPLE)}
           >
             <span className="material-symbols-outlined">favorite</span>
-            Couple
+            Casal
           </button>
           <button
             type="button"
@@ -358,11 +354,10 @@ export function TransactionForm({
             onClick={() => setValue("type", TransactionType.GROUP)}
           >
             <span className="material-symbols-outlined">group</span>
-            Groups
+            Grupos
           </button>
         </div>
 
-        {/* Split Configuration */}
         {(type === TransactionType.COUPLE ||
           type === TransactionType.GROUP) && (
           <div className="split-config-card">
@@ -371,7 +366,7 @@ export function TransactionForm({
                 <span className="material-symbols-outlined">
                   call_split
                 </span>
-                Split Configuration
+                Configuração da divisão
               </h3>
               <div className="split-mode-toggle">
                 <button
@@ -379,7 +374,7 @@ export function TransactionForm({
                   className={`split-mode-btn ${splitMode === "default" ? "active" : ""}`}
                   onClick={setDefaultMode}
                 >
-                  Equal (50/50)
+                  Igual (50/50)
                 </button>
                 <button
                   type="button"
@@ -390,7 +385,7 @@ export function TransactionForm({
                       : setSubsetMode
                   }
                 >
-                  Custom
+                  Personalizada
                 </button>
               </div>
             </div>
@@ -422,7 +417,7 @@ export function TransactionForm({
                       <div className="member-info">
                         <p className="member-name">
                           {member.id === currentUserId
-                            ? "You"
+                            ? "Você"
                             : couple?.partner.name ?? couple?.partner.email}
                         </p>
                         <p className="member-share">
@@ -486,7 +481,7 @@ export function TransactionForm({
                       <div className="member-info">
                         <p className="member-name">
                           {member.id === currentUserId
-                            ? "You"
+                            ? "Você"
                             : member.email}
                         </p>
                         <p className="member-share">
@@ -507,12 +502,10 @@ export function TransactionForm({
         )}
       </div>
 
-      {/* Sidebar Area */}
       <aside className="transaction-form-aside">
-        {/* Category Selector */}
         <div className="form-card">
           <label className="transaction-form-category-label">
-            Category
+            Categoria
           </label>
           <div className="category-grid">
             {Object.values(Category).map((cat) => (
@@ -541,7 +534,7 @@ export function TransactionForm({
           <div className="transaction-form-sidebar-stack">
             {type !== TransactionType.PERSONAL && (
               <div className="input-group">
-                <label>Who Paid</label>
+                <label>Quem pagou</label>
                 <select
                   className="input-field"
                   {...register("paidByUserId")}
@@ -550,14 +543,14 @@ export function TransactionForm({
                     coupleMembers.map((member) => (
                       <option key={member.id} value={member.id}>
                         {member.id === currentUserId
-                          ? "Me"
+                          ? "Eu"
                           : couple?.partner.name ?? couple?.partner.email}
                       </option>
                     ))
                   ) : (
                     groupMembers.map((member) => (
                       <option key={member.id} value={member.id}>
-                        {member.id === currentUserId ? "Me" : member.email}
+                        {member.id === currentUserId ? "Eu" : member.email}
                       </option>
                     ))
                   )}
@@ -566,20 +559,20 @@ export function TransactionForm({
             )}
 
             <div className="input-group">
-              <label>Type</label>
+              <label>Tipo</label>
               <select className="input-field" {...register("direction")}>
                 <option value={TransactionDirection.EXPENSE}>
-                  Expense
+                  Despesa
                 </option>
                 <option value={TransactionDirection.INCOME}>
-                  Income
+                  Receita
                 </option>
               </select>
             </div>
 
             {type === TransactionType.GROUP && (
               <div className="input-group">
-                <label>Group</label>
+                <label>Grupo</label>
                 <select className="input-field" {...register("groupId")}>
                   {groups?.map((group) => (
                     <option key={group.id} value={group.id}>
@@ -592,26 +585,24 @@ export function TransactionForm({
           </div>
         </div>
 
-        {/* Actions */}
         <div className="transaction-form-actions">
           <button
             type="submit"
             className="submit-btn"
             disabled={isPending}
           >
-            {isPending ? "Saving..." : submitLabel}
+            {isPending ? "Salvando..." : submitLabel}
           </button>
           <button
             type="button"
             className="cancel-btn"
             onClick={() => navigate(-1)}
           >
-            Cancel
+            Cancelar
           </button>
         </div>
       </aside>
 
-      {/* Global Errors */}
       <div className="transaction-form-global-errors">
         {errors.paidByUserId && (
           <p className="error-text">{errors.paidByUserId.message}</p>

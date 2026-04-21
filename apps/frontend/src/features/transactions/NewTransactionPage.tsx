@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "../../layout/DashboardLayout";
+import { AuthenticatedPage } from "../../layout/AuthenticatedPage";
 import { apiFetch } from "../../services/api";
 import { TransactionForm } from "./TransactionForm";
 import type { CreateTransactionRequest, Transaction } from "../../types/transaction";
@@ -44,34 +45,33 @@ export function NewTransactionPage({ user, isLoading, hasToken }: Props) {
   });
 
   if (isLoading) {
-    return <div className="loading-state">Loading…</div>;
+    return <div className="loading-state">Carregando formulário…</div>;
   }
 
   if (!hasToken || !user) {
-    return <div className="loading-state">Redirecting to login...</div>;
+    return <div className="loading-state">Redirecionando para o login…</div>;
   }
 
   return (
     <DashboardLayout user={user} activePath="/dashboard">
-      <div className="transaction-form-content">
-          <header className="transaction-form-header">
-            <span className="entry-creation">Entry Creation</span>
-            <h1>
-              Record an <span className="highlight">Expense</span>
-            </h1>
-            <p>
-              Log your latest transaction into the digital ledger. Your editorial
-              clarity begins with precise documentation.
-            </p>
-          </header>
-
+      <AuthenticatedPage
+        className="transaction-page"
+        width="narrow"
+        eyebrow="Nova transação"
+        title={
+          <>
+            Registrar <span className="transaction-page-title-highlight">transação</span>
+          </>
+        }
+        description="Preencha os detalhes abaixo para adicionar uma nova movimentação ao seu histórico financeiro."
+      >
         <TransactionForm
           user={user}
           onSubmit={(values) => mutation.mutate(values)}
           isPending={mutation.isPending}
-          submitLabel="Save Expense"
+          submitLabel="Salvar transação"
         />
-      </div>
+      </AuthenticatedPage>
     </DashboardLayout>
   );
 }

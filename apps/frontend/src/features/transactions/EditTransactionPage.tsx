@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { DashboardLayout } from "../../layout/DashboardLayout";
+import { AuthenticatedPage } from "../../layout/AuthenticatedPage";
 import { apiFetch } from "../../services/api";
 import { TransactionForm } from "./TransactionForm";
 import type { TransactionFormValues } from "./transactionFormSchema";
@@ -52,11 +53,11 @@ export function EditTransactionPage({ user, isLoading, hasToken }: Props) {
   });
 
   if (isLoading || isLoadingTransaction) {
-    return <div className="loading-state">Loading…</div>;
+    return <div className="loading-state">Carregando transação…</div>;
   }
 
   if (!hasToken || !user) {
-    return <div className="loading-state">Redirecting to login...</div>;
+    return <div className="loading-state">Redirecionando para o login…</div>;
   }
 
   const initialValues: Partial<TransactionFormValues> | undefined = transaction
@@ -76,28 +77,27 @@ export function EditTransactionPage({ user, isLoading, hasToken }: Props) {
 
   return (
     <DashboardLayout user={user} activePath="/dashboard">
-      <div className="transaction-form-content">
-          <header className="transaction-form-header">
-            <span className="entry-creation">Entry Edition</span>
-            <h1>
-              Edit <span className="highlight">Expense</span>
-            </h1>
-            <p>
-              Update your transaction in the digital ledger. Your editorial
-              clarity continues with precise adjustments.
-            </p>
-          </header>
-
+      <AuthenticatedPage
+        className="transaction-page"
+        width="narrow"
+        eyebrow="Editar transação"
+        title={
+          <>
+            Atualizar <span className="transaction-page-title-highlight">transação</span>
+          </>
+        }
+        description="Revise os dados abaixo para corrigir ou atualizar esta movimentação financeira."
+      >
         {transaction && (
           <TransactionForm
             user={user}
             initialValues={initialValues}
             onSubmit={(values) => mutation.mutate(values)}
             isPending={mutation.isPending}
-            submitLabel="Update Expense"
+            submitLabel="Atualizar transação"
           />
         )}
-      </div>
+      </AuthenticatedPage>
     </DashboardLayout>
   );
 }
