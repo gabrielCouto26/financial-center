@@ -1,17 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { apiFetch } from '../../services/api';
-import { Button } from '../../design-system/Button/Button';
-import {
-  IconDashboard,
-  IconUser,
-  IconHeart,
-  IconUsers,
-  IconSearch,
-  IconBell,
-  IconSettings,
-  IconPlus,
-} from '../../design-system/Icons';
+import { IconPlus } from '../../design-system/Icons';
+import { Sidebar } from '../../layout/Sidebar';
+import { Header } from '../../layout/Header';
 import './CouplePage.css';
 import type { SafeUser } from '../../types/user';
 import type { CoupleSummary, CoupleBalance } from '../../types/couple';
@@ -30,8 +22,6 @@ type Props = {
 };
 
 export function CouplePage({ user, isLoading }: Props) {
-  const location = useLocation();
-
   const { data: coupleSummary, isLoading: isSummaryLoading, isError: isSummaryError } = useQuery({
     queryKey: ['coupleSummary', user?.id],
     queryFn: () => apiFetch<CoupleSummary>('/couple'),
@@ -43,12 +33,6 @@ export function CouplePage({ user, isLoading }: Props) {
     queryFn: () => apiFetch<CoupleBalance>('/couple/balance'),
     enabled: Boolean(user?.id) && Boolean(coupleSummary),
   });
-
-  function getNavItemClass(path: string) {
-    return `nav-item ${location.pathname === path ? 'nav-item--active' : ''}`;
-  }
-
-  const userInitial = user?.email?.charAt(0).toUpperCase() ?? '';
 
   if (isLoading || isSummaryLoading || isBalanceLoading) {
     return <div className="couple-loading-state">Carregando Casal...</div>;
@@ -65,63 +49,10 @@ export function CouplePage({ user, isLoading }: Props) {
 
   return (
     <div className="couple-page">
-      {/* Sidebar */}
-      <aside className="sidebar">
-        <div className="sidebar-logo">
-          <h1>Financial Center</h1>
-          <p>Digital Concierge</p>
-        </div>
+      <Sidebar user={user} activePath="/couple" />
 
-        <nav className="sidebar-nav">
-          <Link to="/dashboard" className={getNavItemClass('/dashboard')}>
-            <IconDashboard size={20} />
-            Dashboard
-          </Link>
-          <Link to="/personal" className={getNavItemClass('/personal')}>
-            <IconUser size={20} />
-            Personal
-          </Link>
-          <Link to="/couple" className={getNavItemClass('/couple')}>
-            <IconHeart size={20} />
-            Couple
-          </Link>
-          <span className="nav-item nav-item--disabled" aria-disabled="true">
-            <IconUsers size={20} />
-            Groups
-          </span>
-        </nav>
-
-        <div className="sidebar-footer">
-          <Link to="/expense/new" className="w-full">
-            <Button
-              variant="primary"
-              size="md"
-              icon={<IconPlus size={16} />}
-              className="w-full"
-            >
-              New Expense
-            </Button>
-          </Link>
-        </div>
-      </aside>
-
-      {/* Main */}
-      <main className="couple-main">
-        <header className="couple-header">
-          <div className="couple-header-search">
-            <IconSearch size={18} className="couple-header-search-icon" />
-            <input placeholder="Search transactions..." type="text" disabled />
-          </div>
-          <div className="couple-header-actions">
-            <button className="couple-header-icon-btn" aria-label="Notifications">
-              <IconBell size={20} />
-            </button>
-            <button className="couple-header-icon-btn" aria-label="Settings">
-              <IconSettings size={20} />
-            </button>
-            <div className="couple-user-avatar">{userInitial}</div>
-          </div>
-        </header>
+      <main className="main-content">
+        <Header user={user} />
 
         <div className="couple-body">
           <CoupleBalanceHero summary={coupleSummary} balance={coupleBalance} />

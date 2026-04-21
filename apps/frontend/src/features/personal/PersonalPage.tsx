@@ -1,19 +1,10 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { apiFetch, clearStoredToken } from '../../services/api';
 import { Button } from '../../design-system/Button/Button';
 import { Card } from '../../design-system/Card/Card';
 import { Badge } from '../../design-system/Badge/Badge';
-import { Input } from '../../design-system/Input/Input';
 import {
-  IconDashboard,
-  IconUser,
-  IconHeart,
-  IconUsers,
-  IconSearch,
-  IconBell,
-  IconSettings,
-  IconPlus,
   IconFilter,
   IconCalendar,
   IconHome,
@@ -23,7 +14,11 @@ import {
   IconDumbbell,
   IconShoppingBag,
   IconLightbulb,
+  IconDashboard,
+  IconSettings,
 } from '../../design-system/Icons';
+import { Sidebar } from '../../layout/Sidebar';
+import { Header } from '../../layout/Header';
 import './PersonalPage.css';
 import type { DashboardData } from '../../types/dashboard';
 import type { SafeUser } from '../../types/user';
@@ -72,7 +67,6 @@ const categoryAccentClasses = {
 } satisfies Record<Category, { bg: string; bar: string }>;
 
 export function PersonalPage({ user, isLoading, hasToken }: Props) {
-  const location = useLocation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: dashboard, isLoading: isDashboardLoading, isError } = useQuery({
@@ -80,10 +74,6 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
     queryFn: () => apiFetch<DashboardData>('/dashboard'),
     enabled: Boolean(user?.id),
   });
-
-  function getNavItemClass(path: string) {
-    return `nav-item ${location.pathname === path ? 'nav-item--active' : ''}`;
-  }
 
   function logout() {
     clearStoredToken();
@@ -179,7 +169,6 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
       return <div className="loading-state">Unable to load personal data.</div>;
     }
 
-    const userInitial = user.email.slice(0, 1).toUpperCase();
     const comparisonBadge = getComparisonBadge();
     const secondaryHighlights = dashboard.personal.secondaryHighlights;
     const personalRecentTransactions = dashboard.recentTransactions.filter(
@@ -188,73 +177,10 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
 
     return (
       <div className="personal-page">
-        <aside className="sidebar">
-          <div className="sidebar-logo">
-            <h1>Financial Center</h1>
-          </div>
-
-          <nav className="sidebar-nav">
-            <Link to="/" className={getNavItemClass('/')}>
-              <IconDashboard size={20} />
-              Dashboard
-            </Link>
-            <Link to="/personal" className={getNavItemClass('/personal')}>
-              <IconUser size={20} />
-              Personal
-            </Link>
-            <Link to="/couple" className={getNavItemClass('/couple')}>
-              <IconHeart size={20} />
-              Couple
-            </Link>
-            <span className="nav-item nav-item--disabled" aria-disabled="true">
-              <IconUsers size={20} />
-              Groups
-            </span>
-          </nav>
-
-          <div className="sidebar-footer">
-            <Link to="/expense/new" className="w-full">
-              <Button
-                variant="primary"
-                size="md"
-                icon={<IconPlus size={16} />}
-                className="w-full new-expense-btn"
-              >
-                New Expense
-              </Button>
-            </Link>
-          </div>
-        </aside>
+        <Sidebar user={user} activePath="/personal" />
 
         <main className="main-content">
-          <header className="header">
-            <div className="header-search">
-              <IconSearch size={18} className="search-icon" />
-              <Input
-                variant="underlined"
-                placeholder="Search transactions..."
-                className="search-input"
-                disabled
-              />
-            </div>
-            <div className="header-actions">
-              <IconBell size={20} className="action-icon" />
-              <IconSettings size={20} className="action-icon" />
-              <div
-                className="user-profile"
-                onClick={logout}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    logout();
-                  }
-                }}
-                role="button"
-                tabIndex={0}
-              >
-                <span className="user-avatar-fallback">{userInitial}</span>
-              </div>
-            </div>
-          </header>
+          <Header user={user} onLogout={logout} />
 
           <div className="personal-body">
             <section className="hero-section">
