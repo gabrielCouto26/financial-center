@@ -1,9 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
 import { apiFetch } from '../../services/api';
-import { IconPlus } from '../../design-system/Icons';
-import { Sidebar } from '../../layout/Sidebar';
-import { Header } from '../../layout/Header';
+import { DashboardLayout } from '../../layout/DashboardLayout';
 import './CouplePage.css';
 import type { SafeUser } from '../../types/user';
 import type { CoupleSummary, CoupleBalance } from '../../types/couple';
@@ -48,13 +45,8 @@ export function CouplePage({ user, isLoading }: Props) {
   }
 
   return (
-    <div className="couple-page">
-      <Sidebar user={user} activePath="/couple" />
-
-      <main className="main-content">
-        <Header user={user} />
-
-        <div className="couple-body">
+    <DashboardLayout user={user} activePath="/couple">
+      <div className="couple-body">
           <CoupleBalanceHero summary={coupleSummary} balance={coupleBalance} />
 
           <div className="couple-content-grid">
@@ -71,14 +63,7 @@ export function CouplePage({ user, isLoading }: Props) {
               <CoupleGoalCard />
             </div>
           </div>
-        </div>
-      </main>
-
-      {/* FAB */}
-      <Link to="/expense/new" className="couple-fab">
-        <IconPlus size={18} />
-        + Despesa de Casal
-      </Link>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }

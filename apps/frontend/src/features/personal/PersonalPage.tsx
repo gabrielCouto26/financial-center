@@ -17,8 +17,7 @@ import {
   IconDashboard,
   IconSettings,
 } from '../../design-system/Icons';
-import { Sidebar } from '../../layout/Sidebar';
-import { Header } from '../../layout/Header';
+import { DashboardLayout } from '../../layout/DashboardLayout';
 import './PersonalPage.css';
 import type { DashboardData } from '../../types/dashboard';
 import type { SafeUser } from '../../types/user';
@@ -176,13 +175,8 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
     );
 
     return (
-      <div className="personal-page">
-        <Sidebar user={user} activePath="/personal" />
-
-        <main className="main-content">
-          <Header user={user} onLogout={logout} />
-
-          <div className="personal-body">
+      <DashboardLayout user={user} onLogout={logout} activePath="/personal">
+        <div className="personal-body">
             <section className="hero-section">
               <div className="hero-content">
                 <p className="hero-title">Personal Statement</p>
@@ -330,9 +324,8 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
                 </button>
               </div>
             </section>
-          </div>
-        </main>
-      </div>
+        </div>
+      </DashboardLayout>
     );
   }
 

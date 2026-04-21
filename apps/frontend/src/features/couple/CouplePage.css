@@ -2,23 +2,6 @@
    CouplePage — Vanilla CSS using Financial Center design tokens
    ===================================================================== */
 
-/* ─── Page Layout ──────────────────────────────────────────────────── */
-
-.couple-page {
-  display: grid;
-  grid-template-columns: var(--ds-layout-sidebar-dashboardWidth) 1fr;
-  min-height: 100vh;
-  background-color: var(--ds-colors-background-default);
-}
-
-/* ─── Main Content ─────────────────────────────────────────────────── */
-
-.couple-main {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--ds-colors-background-canvas);
-}
-
 /* ─── Page Body ────────────────────────────────────────────────────── */
 
 .couple-body {

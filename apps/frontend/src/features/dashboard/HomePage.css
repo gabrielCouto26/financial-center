@@ -1,21 +1,3 @@
-.dashboard-page {
-  display: grid;
-  grid-template-columns: var(--ds-layout-sidebar-dashboardWidth) 1fr;
-  min-height: 100vh;
-  background-color: var(--ds-colors-background-default);
-}
-
-.dashboard-page > .header {
-  grid-column: 1 / -1;
-}
-
-.main-content {
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  background-color: var(--ds-colors-background-canvas);
-}
-
 .dashboard-body {
   padding: var(--ds-spacing-8);
   max-width: var(--ds-layout-content-maxWidth);

@@ -15,8 +15,7 @@ import {
   IconHeart,
   IconUsers,
 } from '../../design-system/Icons';
-import { Sidebar } from '../../layout/Sidebar';
-import { Header } from '../../layout/Header';
+import { DashboardLayout } from '../../layout/DashboardLayout';
 import './HomePage.css';
 import type { DashboardData } from '../../types/dashboard';
 import {
@@ -132,12 +131,8 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
       dashboard.summary.currentBalance < 0 ? 'danger' : 'success';
 
     return (
-      <div className="dashboard-page">
-        <Header user={user} />
-        <Sidebar />
-
-        <main className="main-content">
-          <div className="dashboard-body">
+      <DashboardLayout user={user} activePath="/dashboard">
+        <div className="dashboard-body">
             <div className="dashboard-grid">
               <Card className="balance-card">
                 <div className="balance-header">
@@ -247,9 +242,8 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
               </Card>
 
             </div>
-          </div>
-        </main>
-      </div>
+        </div>
+      </DashboardLayout>
     );
   }
 
