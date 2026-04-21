@@ -1,7 +1,7 @@
 # Project State – Financial Center
 
-> Última atualização: 2026-04-19
-> Branch: feature/couple-ui
+> Última atualização: 2026-04-21
+> Branch: master
 
 ## Overview
 
@@ -58,14 +58,20 @@ As of this session, the project has a fully functional CI/CD pipeline (GitHub Ac
 - **Main files**: `apps/backend/src/transactions/`, `apps/frontend/src/features/transactions/EditTransactionForm.tsx`, `apps/frontend/src/App.tsx`.
 - **Note**: The edit screen is accessible via `/edit-expense/:id` and mimics the "New Expense" UI.
 
+### User Name Field for Couple Display
+- **What was done**: Added `name` field to User model (Prisma schema) to enable displaying partner names instead of emails throughout the couple feature. Created migration `20260421032323_add_user_name`. Updated all backend types (`SafeUser`, `CoupleMemberSummary`) and service methods to include name. Updated frontend `CoupleMember` type and all components to use `partner.name` with fallback to email.
+- **Main files**: 
+  - Backend: `apps/backend/prisma/schema.prisma`, `apps/backend/src/users/users.service.ts`, `apps/backend/src/couple/couple.service.ts`, `apps/backend/src/auth/dto/register.dto.ts`, `apps/backend/src/auth/auth.service.ts`
+  - Frontend: `apps/frontend/src/types/couple.ts`, `apps/frontend/src/features/transactions/TransactionForm.tsx`, `apps/frontend/src/features/transactions/TransactionList.tsx`, `apps/frontend/src/features/couple/components/CoupleBalanceHero.tsx`, `apps/frontend/src/features/couple/components/CoupleProfileCard.tsx`, `apps/frontend/src/features/couple/components/SharedExpensesList.tsx`, `apps/frontend/src/features/couple/components/SettlementCard.tsx`
+- **Note**: The WHO PAID dropdown in TransactionForm now displays partner names when available. All couple-related components use the pattern `partner.name ?? partner.email` for graceful fallback.
+
 ## Where Development Stopped
 
 - **In Progress**:
-  - **CouplePage PR**: All changes are staged on `feature/couple-ui`. Next step is opening a PR to `master` (CI will run automatically).
   - **Groups**: Backend models and basic endpoints exist; UI is locked to a "Coming Soon" (Em breve) state in the Dashboard.
 - **Next Steps**:
-  1. Open PR from `feature/couple-ui` → `master` and pass CI checks.
-  2. Validate `CouplePage` rendering with real API data (real partner link required).
+  1. Add name input field to frontend registration form (backend already supports it).
+  2. Implement user profile/settings page to allow users to set/update their name.
   3. Implement global Toast notifications for transaction success/error feedback.
   4. Activate Group management UI (create group, add members, view balance).
   5. Expand filtering and pagination for long transaction lists in all contexts.

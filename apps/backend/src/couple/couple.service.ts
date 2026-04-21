@@ -26,6 +26,7 @@ type CoupleLinkRecord = CoupleLink & {
 export type CoupleMemberSummary = {
   id: string;
   email: string;
+  name: string | null;
 };
 
 export type CoupleSummary = {
@@ -178,6 +179,7 @@ export class CoupleService {
       partner: {
         id: partner.id,
         email: partner.email,
+        name: partner.name,
       },
       totals: rounded,
       net,
@@ -240,6 +242,7 @@ export class CoupleService {
     const members = couple.members.map((member) => ({
       id: member.user.id,
       email: member.user.email,
+      name: member.user.name,
     }));
     const partner = this.getPartner(couple, userId);
 
@@ -248,6 +251,7 @@ export class CoupleService {
       partner: {
         id: partner.id,
         email: partner.email,
+        name: partner.name,
       },
       members,
     };
@@ -259,6 +263,7 @@ export class CoupleService {
       members: couple.members.map((member) => ({
         id: member.user.id,
         email: member.user.email,
+        name: member.user.name,
       })),
       createdAt: couple.createdAt,
     };

@@ -44,7 +44,11 @@ export class AuthService {
       dto.password,
       AuthService.BCRYPT_ROUNDS,
     );
-    const user = await this.usersService.create(dto.email, passwordHash);
+    const user = await this.usersService.create(
+      dto.email,
+      passwordHash,
+      dto.name,
+    );
     const accessToken = await this.signToken(user.id, user.email);
     return { accessToken, user };
   }

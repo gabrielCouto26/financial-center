@@ -423,7 +423,7 @@ export function TransactionForm({
                         <p className="member-name">
                           {member.id === currentUserId
                             ? "You"
-                            : couple?.partner.email}
+                            : couple?.partner.name ?? couple?.partner.email}
                         </p>
                         <p className="member-share">
                           {formatCurrency(shareAmount)}
@@ -551,7 +551,7 @@ export function TransactionForm({
                       <option key={member.id} value={member.id}>
                         {member.id === currentUserId
                           ? "Me"
-                          : couple?.partner.email}
+                          : couple?.partner.name ?? couple?.partner.email}
                       </option>
                     ))
                   ) : (

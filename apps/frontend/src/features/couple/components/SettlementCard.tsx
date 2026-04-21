@@ -11,7 +11,7 @@ export function SettlementCard({ summary, balance }: Props) {
 
   let text = 'Todas as contas estão em dia entre vocês.';
   if (owesYou) {
-    const partnerName = summary.partner.email.split('@')[0];
+    const partnerName = summary.partner.name ?? summary.partner.email.split('@')[0];
     text = `Considerando todas as despesas, o saldo favorece você. ${partnerName} deve te pagar.`;
   } else if (youOwe) {
     text = 'Considerando todas as despesas, o saldo favorece o seu parceiro. Você tem dívidas a liquidar.';

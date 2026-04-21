@@ -11,6 +11,7 @@ datasource db {
 model User {
   id               String            @id @default(uuid())
   email            String            @unique
+  name             String?
   passwordHash     String            @map("password_hash")
   passwordResetTokenHash String?     @map("password_reset_token_hash")
   passwordResetExpiresAt DateTime?   @map("password_reset_expires_at")

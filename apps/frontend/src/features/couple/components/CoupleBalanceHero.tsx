@@ -6,7 +6,7 @@ type Props = {
 };
 
 export function CoupleBalanceHero({ summary, balance }: Props) {
-  const partnerFirstName = summary.partner.email.split('@')[0];
+  const partnerFirstName = summary.partner.name ?? summary.partner.email.split('@')[0];
 
   let labelModifier = 'neutral';
   let amountModifier = 'neutral';

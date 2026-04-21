@@ -8,7 +8,7 @@ type Props = {
 };
 
 export function CoupleProfileCard({ user, summary, balance }: Props) {
-  const partnerFirstName = summary.partner.email.split('@')[0];
+  const partnerFirstName = summary.partner.name ?? summary.partner.email.split('@')[0];
   const totalSpend = balance.totals.youPaid + balance.totals.partnerPaid;
   const totalFormatted = new Intl.NumberFormat('pt-BR', {
     style: 'currency',
