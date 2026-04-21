@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
-export type SafeUser = Pick<User, 'id' | 'email' | 'createdAt' | 'updatedAt'>;
+export type SafeUser = Pick<
+  User,
+  'id' | 'email' | 'name' | 'createdAt' | 'updatedAt'
+>;
 
 @Injectable()
 export class UsersService {
@@ -18,11 +21,16 @@ export class UsersService {
     return this.prisma.user.findUnique({ where: { id } });
   }
 
-  async create(email: string, passwordHash: string): Promise<SafeUser> {
+  async create(
+    email: string,
+    passwordHash: string,
+    name: string,
+  ): Promise<SafeUser> {
     const user = await this.prisma.user.create({
       data: {
         email: email.toLowerCase(),
         passwordHash,
+        name,
       },
     });
     return this.toSafeUser(user);
@@ -63,6 +71,7 @@ export class UsersService {
     return {
       id: user.id,
       email: user.email,
+      name: user.name,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };

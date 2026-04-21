@@ -49,7 +49,7 @@ export function TransactionList({ currentUserId }: Props) {
         .map((split) => {
           const label =
             split.userId === couple?.partner?.id && couple?.partner?.email
-              ? couple.partner.email
+              ? couple.partner.name ?? couple.partner.email
               : "You";
           return `${label}: ${split.percentage}%`;
         })

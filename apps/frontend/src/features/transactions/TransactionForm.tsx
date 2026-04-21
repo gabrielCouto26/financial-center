@@ -272,7 +272,7 @@ export function TransactionForm({
       {/* Main Content Area */}
       <div className="transaction-form-main">
         <div className="form-card">
-          <div className="flex flex-col gap-8">
+          <div className="transaction-form-card-stack">
             {/* Transaction Name */}
             <div
               className={`input-group ${errors.name ? "field-error" : ""}`}
@@ -423,7 +423,7 @@ export function TransactionForm({
                         <p className="member-name">
                           {member.id === currentUserId
                             ? "You"
-                            : couple?.partner.email}
+                            : couple?.partner.name ?? couple?.partner.email}
                         </p>
                         <p className="member-share">
                           {formatCurrency(shareAmount)}
@@ -511,7 +511,7 @@ export function TransactionForm({
       <aside className="transaction-form-aside">
         {/* Category Selector */}
         <div className="form-card">
-          <label className="block text-sm font-bold text-on-surface-variant mb-6 uppercase tracking-[0.1em]">
+          <label className="transaction-form-category-label">
             Category
           </label>
           <div className="category-grid">
@@ -538,32 +538,32 @@ export function TransactionForm({
 
         {/* Paid By & Direction */}
         <div className="form-card">
-          <div className="space-y-6">
-            <div className="input-group">
-              <label className="tracking-[0.1em]">Who Paid</label>
-              <select
-                className="input-field"
-                {...register("paidByUserId")}
-              >
-                {type === TransactionType.PERSONAL ? (
-                  <option value={currentUserId}>Me</option>
-                ) : type === TransactionType.COUPLE ? (
-                  coupleMembers.map((member) => (
-                    <option key={member.id} value={member.id}>
-                      {member.id === currentUserId
-                        ? "Me"
-                        : couple?.partner.email}
-                    </option>
-                  ))
-                ) : (
-                  groupMembers.map((member) => (
-                    <option key={member.id} value={member.id}>
-                      {member.id === currentUserId ? "Me" : member.email}
-                    </option>
-                  ))
-                )}
-              </select>
-            </div>
+          <div className="transaction-form-sidebar-stack">
+            {type !== TransactionType.PERSONAL && (
+              <div className="input-group">
+                <label>Who Paid</label>
+                <select
+                  className="input-field"
+                  {...register("paidByUserId")}
+                >
+                  {type === TransactionType.COUPLE ? (
+                    coupleMembers.map((member) => (
+                      <option key={member.id} value={member.id}>
+                        {member.id === currentUserId
+                          ? "Me"
+                          : couple?.partner.name ?? couple?.partner.email}
+                      </option>
+                    ))
+                  ) : (
+                    groupMembers.map((member) => (
+                      <option key={member.id} value={member.id}>
+                        {member.id === currentUserId ? "Me" : member.email}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+            )}
 
             <div className="input-group">
               <label>Type</label>
@@ -593,7 +593,7 @@ export function TransactionForm({
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col gap-4">
+        <div className="transaction-form-actions">
           <button
             type="submit"
             className="submit-btn"
@@ -612,7 +612,7 @@ export function TransactionForm({
       </aside>
 
       {/* Global Errors */}
-      <div className="col-span-12">
+      <div className="transaction-form-global-errors">
         {errors.paidByUserId && (
           <p className="error-text">{errors.paidByUserId.message}</p>
         )}

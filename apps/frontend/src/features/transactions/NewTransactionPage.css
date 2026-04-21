@@ -1,12 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
-
-.transaction-form-page {
-  display: grid;
-  grid-template-columns: var(--ds-layout-sidebar-dashboardWidth) 1fr;
-  min-height: 100vh;
-  background-color: var(--ds-colors-background-default);
-}
 
 .transaction-form-content {
   padding: var(--ds-spacing-8);
@@ -104,6 +96,38 @@
   padding: var(--ds-spacing-6);
 }
 
+.transaction-form-card-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-10);
+}
+
+.transaction-form-sidebar-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-8);
+}
+
+.transaction-form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-4);
+}
+
+.transaction-form-category-label {
+  display: block;
+  font-size: var(--ds-typography-fontSize-14);
+  font-weight: var(--ds-typography-fontWeight-bold);
+  color: var(--ds-colors-text-secondary);
+  margin-bottom: var(--ds-spacing-6);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.transaction-form-global-errors {
+  grid-column: 1 / -1;
+}
+
 .input-group {
   display: flex;
   flex-direction: column;
@@ -161,12 +185,13 @@
 .form-row {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--ds-spacing-6);
+  gap: var(--ds-spacing-8);
 }
 
 @media (min-width: 768px) {
   .form-row {
     grid-template-columns: 1fr 1fr;
+    gap: var(--ds-spacing-6);
   }
 }
 
@@ -333,15 +358,35 @@
 .category-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--ds-spacing-3);
+  gap: var(--ds-spacing-2);
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: var(--ds-spacing-1);
+}
+
+.category-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.category-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.category-grid::-webkit-scrollbar-thumb {
+  background: var(--ds-colors-neutral-200);
+  border-radius: var(--ds-radius-full);
+}
+
+.category-grid::-webkit-scrollbar-thumb:hover {
+  background: var(--ds-colors-neutral-300);
 }
 
 .category-btn {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: var(--ds-spacing-3);
-  padding: var(--ds-spacing-3);
+  gap: var(--ds-spacing-2);
+  padding: var(--ds-spacing-2);
   border-radius: var(--ds-radius-lg);
   border: 2px solid transparent;
   background: transparent;

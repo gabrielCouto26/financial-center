@@ -1,6 +1,7 @@
 export type CoupleMember = {
   id: string;
   email: string;
+  name: string | null;
 };
 
 export type CoupleSummary = {

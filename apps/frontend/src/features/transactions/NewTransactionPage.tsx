@@ -1,17 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Button } from "../../design-system/Button/Button";
-import { Input } from "../../design-system/Input/Input";
-import {
-  IconDashboard,
-  IconUser,
-  IconHeart,
-  IconUsers,
-  IconSearch,
-  IconBell,
-  IconSettings,
-  IconPlus,
-} from "../../design-system/Icons";
+import { useNavigate } from "react-router-dom";
+import { DashboardLayout } from "../../layout/DashboardLayout";
 import { apiFetch } from "../../services/api";
 import { TransactionForm } from "./TransactionForm";
 import type { CreateTransactionRequest, Transaction } from "../../types/transaction";
@@ -26,7 +15,6 @@ type Props = {
 
 export function NewTransactionPage({ user, isLoading, hasToken }: Props) {
   const navigate = useNavigate();
-  const location = useLocation();
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -55,10 +43,6 @@ export function NewTransactionPage({ user, isLoading, hasToken }: Props) {
     },
   });
 
-  const getNavItemClass = (path: string) => {
-    return `nav-item ${location.pathname === path ? "nav-item--active" : ""}`;
-  };
-
   if (isLoading) {
     return <div className="loading-state">Loading…</div>;
   }
@@ -67,68 +51,9 @@ export function NewTransactionPage({ user, isLoading, hasToken }: Props) {
     return <div className="loading-state">Redirecting to login...</div>;
   }
 
-  const userInitial = user.email.slice(0, 1).toUpperCase();
-
   return (
-    <div className="transaction-form-page">
-      <aside className="sidebar">
-        <div className="sidebar-logo">
-          <h1>Financial Center</h1>
-        </div>
-
-        <nav className="sidebar-nav">
-          <Link to="/dashboard" className={getNavItemClass("/dashboard")}>
-            <IconDashboard size={20} />
-            Dashboard
-          </Link>
-          <Link to="/personal" className={getNavItemClass("/personal")}>
-            <IconUser size={20} />
-            Personal
-          </Link>
-          <span className="nav-item nav-item--disabled" aria-disabled="true">
-            <IconHeart size={20} />
-            Couple
-          </span>
-          <span className="nav-item nav-item--disabled" aria-disabled="true">
-            <IconUsers size={20} />
-            Groups
-          </span>
-        </nav>
-
-        <div className="sidebar-footer">
-          <Button
-            variant="primary"
-            size="md"
-            icon={<IconPlus size={16} />}
-            className="w-full"
-            disabled
-          >
-            New Expense
-          </Button>
-        </div>
-      </aside>
-
-      <main className="main-content">
-        <header className="header">
-          <div className="header-search">
-            <IconSearch size={18} className="search-icon" />
-            <Input
-              variant="underlined"
-              placeholder="Search..."
-              className="search-input"
-              disabled
-            />
-          </div>
-          <div className="header-actions">
-            <IconBell size={20} className="action-icon" />
-            <IconSettings size={20} className="action-icon" />
-            <div className="user-profile">
-              <span className="user-avatar-fallback">{userInitial}</span>
-            </div>
-          </div>
-        </header>
-
-        <div className="transaction-form-content">
+    <DashboardLayout user={user} activePath="/dashboard">
+      <div className="transaction-form-content">
           <header className="transaction-form-header">
             <span className="entry-creation">Entry Creation</span>
             <h1>
@@ -140,14 +65,13 @@ export function NewTransactionPage({ user, isLoading, hasToken }: Props) {
             </p>
           </header>
 
-          <TransactionForm
-            user={user}
-            onSubmit={(values) => mutation.mutate(values)}
-            isPending={mutation.isPending}
-            submitLabel="Save Expense"
-          />
-        </div>
-      </main>
-    </div>
+        <TransactionForm
+          user={user}
+          onSubmit={(values) => mutation.mutate(values)}
+          isPending={mutation.isPending}
+          submitLabel="Save Expense"
+        />
+      </div>
+    </DashboardLayout>
   );
 }

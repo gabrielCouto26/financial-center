@@ -1,18 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link, useLocation } from 'react-router-dom';
-import { Button } from '../../design-system/Button/Button';
+import { Link } from 'react-router-dom';
 import { Card } from '../../design-system/Card/Card';
-import { Input } from '../../design-system/Input/Input';
 import { apiFetch } from '../../services/api';
 import {
-  IconDashboard,
-  IconUser,
-  IconHeart,
-  IconUsers,
-  IconSearch,
-  IconBell,
-  IconSettings,
-  IconPlus,
   IconBus,
   IconDumbbell,
   IconFilm,
@@ -20,7 +10,12 @@ import {
   IconLightbulb,
   IconShoppingBag,
   IconUtensils,
+  IconDashboard,
+  IconSettings,
+  IconHeart,
+  IconUsers,
 } from '../../design-system/Icons';
+import { DashboardLayout } from '../../layout/DashboardLayout';
 import './HomePage.css';
 import type { DashboardData } from '../../types/dashboard';
 import {
@@ -37,16 +32,11 @@ type Props = {
 };
 
 export function HomePage({ user, isLoading, hasToken }: Props) {
-  const location = useLocation();
   const { data: dashboard, isLoading: isDashboardLoading, isError } = useQuery({
     queryKey: ['dashboard', user?.id],
     queryFn: () => apiFetch<DashboardData>('/dashboard'),
     enabled: Boolean(user?.id),
   });
-
-  const getNavItemClass = (path: string) => {
-    return `nav-item ${location.pathname === path ? 'nav-item--active' : ''}`;
-  };
 
   const categoryIcons = {
     [Category.HOUSING]: <IconHome size={24} />,
@@ -139,69 +129,10 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
 
     const balanceClassName =
       dashboard.summary.currentBalance < 0 ? 'danger' : 'success';
-    const userInitial = user.email.slice(0, 1).toUpperCase();
 
     return (
-      <div className="dashboard-page">
-        <aside className="sidebar">
-          <div className="sidebar-logo">
-            <h1>Financial Center</h1>
-          </div>
-
-          <nav className="sidebar-nav">
-            <Link to="/dashboard" className={getNavItemClass('/dashboard')}>
-              <IconDashboard size={20} />
-              Dashboard
-            </Link>
-            <Link to="/personal" className={getNavItemClass('/personal')}>
-              <IconUser size={20} />
-              Personal
-            </Link>
-            <Link to="/couple" className={getNavItemClass('/couple')}>
-              <IconHeart size={20} />
-              Couple
-            </Link>
-            <span className="nav-item nav-item--disabled" aria-disabled="true">
-              <IconUsers size={20} />
-              Groups
-            </span>
-          </nav>
-
-          <div className="sidebar-footer">
-            <Link to="/new-expense" className="w-full">
-              <Button
-                variant="primary"
-                size="md"
-                icon={<IconPlus size={16} />}
-                className="w-full"
-              >
-                New Expense
-              </Button>
-            </Link>
-          </div>
-        </aside>
-
-        <main className="main-content">
-          <header className="header">
-            <div className="header-search">
-              <IconSearch size={18} className="search-icon" />
-              <Input
-                variant="underlined"
-                placeholder="Busca indisponivel nesta tela"
-                className="search-input"
-                disabled
-              />
-            </div>
-            <div className="header-actions">
-              <IconBell size={20} className="action-icon" />
-              <IconSettings size={20} className="action-icon" />
-              <div className="user-profile">
-                <span className="user-avatar-fallback">{userInitial}</span>
-              </div>
-            </div>
-          </header>
-
-          <div className="dashboard-body">
+      <DashboardLayout user={user} activePath="/dashboard">
+        <div className="dashboard-body">
             <div className="dashboard-grid">
               <Card className="balance-card">
                 <div className="balance-header">
@@ -255,7 +186,7 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
                     dashboard.recentTransactions.map((tx) => (
                       <Link
                         key={tx.id}
-                        to={`/edit-expense/${tx.id}`}
+                        to={`/expense/edit/${tx.id}`}
                         className="transaction-item-link"
                       >
                         <Card className="transaction-item-card">
@@ -311,9 +242,8 @@ export function HomePage({ user, isLoading, hasToken }: Props) {
               </Card>
 
             </div>
-          </div>
-        </main>
-      </div>
+        </div>
+      </DashboardLayout>
     );
   }
 

@@ -40,7 +40,7 @@ export function SharedExpensesList({ currentUserId, summary }: Props) {
     queryFn: () => apiFetch<PaginatedTransactions>('/transactions?type=COUPLE&limit=5'),
   });
 
-  const partnerFirstName = summary.partner.email.split('@')[0];
+  const partnerFirstName = summary.partner.name ?? summary.partner.email.split('@')[0];
 
   if (isLoading) {
     return (
