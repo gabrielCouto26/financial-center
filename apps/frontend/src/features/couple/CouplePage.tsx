@@ -11,6 +11,7 @@ import { SharedExpensesList } from './components/SharedExpensesList';
 import { SettlementCard } from './components/SettlementCard';
 import { CoupleProfileCard } from './components/CoupleProfileCard';
 import { CoupleGoalCard } from './components/CoupleGoalCard';
+import { AuthenticatedPage } from '../../layout/AuthenticatedPage';
 
 type Props = {
   user?: SafeUser;
@@ -32,7 +33,7 @@ export function CouplePage({ user, isLoading }: Props) {
   });
 
   if (isLoading || isSummaryLoading || isBalanceLoading) {
-    return <div className="couple-loading-state">Carregando Casal...</div>;
+    return <div className="couple-loading-state">Carregando área do casal…</div>;
   }
 
   if (isSummaryError || isBalanceError || !coupleSummary || !coupleBalance) {
@@ -46,7 +47,12 @@ export function CouplePage({ user, isLoading }: Props) {
 
   return (
     <DashboardLayout user={user} activePath="/couple">
-      <div className="couple-body">
+      <AuthenticatedPage
+        className="couple-page"
+        eyebrow="Casal"
+        title="Área do casal"
+        description="Acompanhe pendências, despesas compartilhadas e a divisão entre vocês."
+      >
           <CoupleBalanceHero summary={coupleSummary} balance={coupleBalance} />
 
           <div className="couple-content-grid">
@@ -63,7 +69,7 @@ export function CouplePage({ user, isLoading }: Props) {
               <CoupleGoalCard />
             </div>
           </div>
-      </div>
+      </AuthenticatedPage>
     </DashboardLayout>
   );
 }

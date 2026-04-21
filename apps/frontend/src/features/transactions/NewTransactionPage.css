@@ -1,48 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 
-.transaction-form-content {
-  padding: var(--ds-spacing-8);
-  max-width: var(--ds-layout-content-maxWidth);
-  width: 100%;
-  margin: 0 auto;
-}
-
-.transaction-form-header {
-  margin-bottom: var(--ds-spacing-12);
-  text-align: left;
-}
-
-.transaction-form-header .entry-creation {
-  display: block;
-  font-size: var(--ds-typography-fontSize-12);
-  font-weight: var(--ds-typography-fontWeight-bold);
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--ds-colors-brand-800);
-  margin-bottom: var(--ds-spacing-2);
-}
-
-.transaction-form-header h1 {
-  font-family: var(--ds-typography-fontFamily-display);
-  font-size: var(--ds-typography-fontSize-48);
-  font-weight: var(--ds-typography-fontWeight-extrabold);
-  color: var(--ds-colors-neutral-900);
-  letter-spacing: -0.02em;
-  margin: 0 0 var(--ds-spacing-4) 0;
-}
-
-.transaction-form-header h1 .highlight {
+.transaction-page-title-highlight {
   background: var(--ds-colors-brand-gradient);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-.transaction-form-header p {
-  color: var(--ds-colors-text-secondary);
-  max-width: 40rem;
-  font-size: var(--ds-typography-fontSize-18);
-  line-height: var(--ds-typography-lineHeight-lg);
 }
 
 .transaction-form-grid {
@@ -86,13 +48,14 @@
 .form-card {
   background: var(--ds-colors-background-surface);
   padding: var(--ds-spacing-8);
-  border-radius: var(--ds-radius-xl);
-  border: 1px solid var(--ds-colors-border-default);
+  border-radius: var(--ds-components-card-radius);
+  box-shadow: var(--ds-components-card-shadow);
 }
 
 .transaction-form-aside .form-card {
-  background: var(--ds-colors-neutral-50);
-  border: none;
+  background: var(--ds-colors-background-subtle);
+  border: 1px solid var(--ds-colors-border-default);
+  box-shadow: none;
   padding: var(--ds-spacing-6);
 }
 
@@ -144,8 +107,8 @@
 
 .input-field {
   width: 100%;
-  background: var(--ds-colors-neutral-50);
-  border: none;
+  background: var(--ds-colors-background-surface);
+  border: 1px solid var(--ds-colors-border-default);
   border-radius: var(--ds-radius-lg);
   padding: var(--ds-spacing-4) var(--ds-spacing-6);
   font-size: var(--ds-typography-fontSize-18);
@@ -155,8 +118,7 @@
 }
 
 .input-field:focus {
-  background: var(--ds-colors-background-surface);
-  box-shadow: 0 0 0 2px var(--ds-colors-brand-800);
+  box-shadow: 0 0 0 2px var(--ds-colors-border-focus);
   outline: none;
 }
 
@@ -209,7 +171,7 @@
 }
 
 .type-toggle {
-  background: var(--ds-colors-neutral-75);
+  background: var(--ds-colors-background-subtle);
   padding: var(--ds-spacing-1);
   border-radius: var(--ds-radius-full);
   display: flex;
@@ -248,14 +210,14 @@
 }
 
 .type-toggle-btn:hover:not(.active) {
-  background: var(--ds-colors-neutral-100);
+  background: var(--ds-colors-background-muted);
 }
 
 .split-config-card {
-  background: rgba(0, 72, 141, 0.05);
+  background: var(--ds-colors-background-info);
   padding: var(--ds-spacing-8);
   border-radius: var(--ds-radius-xl);
-  border: 2px solid rgba(0, 72, 141, 0.1);
+  border: 1px solid var(--ds-colors-primary-50);
 }
 
 .split-config-header {
@@ -452,7 +414,7 @@
 
 .submit-btn:hover:not(:disabled) {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 15px 30px -5px rgba(0, 56, 141, 0.3);
+  box-shadow: var(--ds-shadows-lg);
 }
 
 .submit-btn:active:not(:disabled) {
@@ -491,4 +453,14 @@
 
 .field-error .input-field {
   box-shadow: 0 0 0 2px var(--ds-colors-text-danger) !important;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-family: var(--ds-typography-fontFamily-primary);
+  color: var(--ds-colors-text-secondary);
+  background-color: var(--ds-colors-background-canvas);
 }

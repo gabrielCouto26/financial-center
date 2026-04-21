@@ -7,15 +7,15 @@ import {
 
 const splitSchema = z.object({
   userId: z.string().uuid(),
-  percentage: z.coerce.number().positive("Percentage must be positive"),
+  percentage: z.coerce.number().positive("A porcentagem deve ser positiva"),
 });
 
 export const transactionSchema = z
   .object({
-    name: z.string().min(1, "Name is required"),
-    amount: z.coerce.number().positive("Amount must be positive"),
+    name: z.string().min(1, "O nome é obrigatório"),
+    amount: z.coerce.number().positive("O valor deve ser positivo"),
     category: z.nativeEnum(Category),
-    date: z.string().min(1, "Date is required"),
+    date: z.string().min(1, "A data é obrigatória"),
     type: z.nativeEnum(TransactionType),
     direction: z.nativeEnum(TransactionDirection),
     paidByUserId: z.string().optional(),
@@ -31,7 +31,7 @@ export const transactionSchema = z
     if (!values.paidByUserId) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Payer is required",
+        message: "Quem pagou é obrigatório",
         path: ["paidByUserId"],
       });
     }
@@ -40,14 +40,14 @@ export const transactionSchema = z
       if (values.groupId || values.participantUserIds) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Couple transactions cannot include group fields",
+          message: "Transações do casal não podem incluir campos de grupo",
           path: ["groupId"],
         });
       }
       if (values.splits && values.splits.length !== 2) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Custom couple splits require two participants",
+          message: "Divisões personalizadas do casal exigem dois participantes",
           path: ["splits"],
         });
       }
@@ -57,21 +57,21 @@ export const transactionSchema = z
       if (!values.groupId) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Group is required",
+          message: "O grupo é obrigatório",
           path: ["groupId"],
         });
       }
       if (values.participantUserIds && values.splits) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Choose selected members or custom split, not both",
+          message: "Escolha membros selecionados ou divisão personalizada, não os dois",
           path: ["participantUserIds"],
         });
       }
       if (values.participantUserIds && values.participantUserIds.length < 2) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Select at least two participants",
+          message: "Selecione pelo menos dois participantes",
           path: ["participantUserIds"],
         });
       }
@@ -85,7 +85,7 @@ export const transactionSchema = z
       if (Math.abs(total - 100) > 0.001) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Split percentages must total 100",
+          message: "A soma das porcentagens deve totalizar 100",
           path: ["splits"],
         });
       }

@@ -2,15 +2,6 @@
    CouplePage — Vanilla CSS using Financial Center design tokens
    ===================================================================== */
 
-/* ─── Page Body ────────────────────────────────────────────────────── */
-
-.couple-body {
-  padding: var(--ds-spacing-8);
-  max-width: var(--ds-layout-content-maxWidth);
-  width: 100%;
-  margin: 0 auto;
-}
-
 /* ─── Hero — Balance Block ─────────────────────────────────────────── */
 
 .couple-hero {
@@ -560,7 +551,7 @@
   height: 100vh;
   font-family: var(--ds-typography-fontFamily-primary);
   color: var(--ds-colors-text-secondary);
-  background-color: var(--ds-colors-background-default);
+  background-color: var(--ds-colors-background-canvas);
 }
 
 .couple-error-state {

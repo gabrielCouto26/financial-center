@@ -22,6 +22,7 @@ import './PersonalPage.css';
 import type { DashboardData } from '../../types/dashboard';
 import type { SafeUser } from '../../types/user';
 import { Category, TransactionType } from '../../types/transaction';
+import { AuthenticatedPage } from '../../layout/AuthenticatedPage';
 
 type Props = {
   user?: SafeUser;
@@ -102,7 +103,7 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
     }
 
     return new Date(parsedYear, parsedMonth - 1, 1).toLocaleDateString(
-      'en-US',
+      'pt-BR',
       {
         month: 'long',
         year: 'numeric',
@@ -111,10 +112,9 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
   }
 
   function formatTransactionDate(value: string): string {
-    return new Date(value).toLocaleDateString('en-US', {
+    return new Date(value).toLocaleDateString('pt-BR', {
+      day: '2-digit',
       month: 'short',
-      day: 'numeric',
-      year: 'numeric',
     });
   }
 
@@ -126,20 +126,20 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
     const percentage = dashboard.personal.monthOverMonthPercentage;
     if (percentage === null) {
       return {
-        text: 'No previous-month baseline',
+        text: 'Sem base do mês anterior',
         variant: 'neutral' as const,
       };
     }
 
     if (percentage <= 0) {
       return {
-        text: `VS LAST MONTH ${percentage.toFixed(2)}%`,
+        text: `Vs. mês anterior ${percentage.toFixed(2)}%`,
         variant: 'success' as const,
       };
     }
 
     return {
-      text: `VS LAST MONTH +${percentage.toFixed(2)}%`,
+      text: `Vs. mês anterior +${percentage.toFixed(2)}%`,
       variant: 'warning' as const,
     };
   }
@@ -147,25 +147,25 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
   function getTransactionSourceLabel(type: TransactionType): string {
     switch (type) {
       case TransactionType.COUPLE:
-        return 'Couple Account';
+        return 'Conta do casal';
       case TransactionType.GROUP:
-        return 'Group Split';
+        return 'Divisão em grupo';
       default:
-        return 'Personal Wallet';
+        return 'Carteira pessoal';
     }
   }
 
   if (hasToken && isLoading) {
-    return <div className="loading-state">Loading session…</div>;
+    return <div className="loading-state">Carregando sessão…</div>;
   }
 
   if (hasToken && user) {
     if (isDashboardLoading) {
-      return <div className="loading-state">Loading personal data…</div>;
+      return <div className="loading-state">Carregando resumo pessoal…</div>;
     }
 
     if (isError || !dashboard) {
-      return <div className="loading-state">Unable to load personal data.</div>;
+      return <div className="loading-state">Não foi possível carregar o resumo pessoal.</div>;
     }
 
     const comparisonBadge = getComparisonBadge();
@@ -176,15 +176,20 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
 
     return (
       <DashboardLayout user={user} onLogout={logout} activePath="/personal">
-        <div className="personal-body">
+        <AuthenticatedPage
+          width="narrow"
+          eyebrow="Pessoal"
+          title="Resumo pessoal"
+          description="Veja a evolução dos seus gastos, categorias mais relevantes e a atividade recente."
+        >
             <section className="hero-section">
               <div className="hero-content">
-                <p className="hero-title">Personal Statement</p>
+                <p className="hero-title">Total do mês</p>
                 <h1 className="hero-balance">
                   {formatCurrency(dashboard.personal.currentMonthTotal)}
                 </h1>
                 <p className="hero-subtitle">
-                  Total spent in {formatMonth(dashboard.period.month)}
+                  Total gasto em {formatMonth(dashboard.period.month)}
                 </p>
               </div>
               <div className="hero-badge-container">
@@ -229,7 +234,7 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
                 })
               ) : (
                 <Card className="summary-empty-card">
-                  No personal category activity found for this month.
+                  Nenhuma categoria pessoal teve movimentação neste mês.
                 </Card>
               )}
             </section>
@@ -246,33 +251,33 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
                 ))}
               </div>
               <div className="avatar-stack">
-                <div className="avatar-capsule bg-blue-mid">MO</div>
-                <div className="avatar-capsule bg-green-mid">GYM</div>
-                <div className="avatar-capsule bg-orange-mid">PUB</div>
+                <div className="avatar-capsule bg-blue-mid">MOR</div>
+                <div className="avatar-capsule bg-green-mid">SAÚ</div>
+                <div className="avatar-capsule bg-orange-mid">LAZ</div>
               </div>
             </section>
 
             <section className="activity-section">
               <div className="section-header">
-                <h2 className="section-title">Recent Activity</h2>
+                <h2 className="section-title">Atividade recente</h2>
                 <div className="section-actions">
                   <Button
                     variant="secondary"
                     size="sm"
                     icon={<IconFilter size={14} />}
                     disabled
-                    title="Filtering is not available on this page yet."
+                    title="A filtragem ainda não está disponível nesta página."
                   >
-                    Filter
+                    Filtrar
                   </Button>
                   <Button
                     variant="secondary"
                     size="sm"
                     icon={<IconCalendar size={14} />}
                     disabled
-                    title="Date filtering is not available on this page yet."
+                    title="O filtro por data ainda não está disponível nesta página."
                   >
-                    Date
+                    Data
                   </Button>
                 </div>
               </div>
@@ -313,18 +318,18 @@ export function PersonalPage({ user, isLoading, hasToken }: Props) {
                   ))
                 ) : (
                   <Card className="summary-empty-card">
-                    No personal activity found for this user.
+                    Nenhuma atividade pessoal encontrada para este usuário.
                   </Card>
                 )}
               </div>
 
               <div className="load-more">
                 <button className="load-more-btn" disabled>
-                  Load More Transactions
+                  Carregar mais transações
                 </button>
               </div>
             </section>
-        </div>
+        </AuthenticatedPage>
       </DashboardLayout>
     );
   }

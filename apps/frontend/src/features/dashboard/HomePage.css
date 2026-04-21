@@ -1,10 +1,3 @@
-.dashboard-body {
-  padding: var(--ds-spacing-8);
-  max-width: var(--ds-layout-content-maxWidth);
-  width: 100%;
-  margin: 0 auto;
-}
-
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -439,6 +432,7 @@
   height: 100vh;
   font-family: var(--ds-typography-fontFamily-primary);
   color: var(--ds-colors-text-secondary);
+  background-color: var(--ds-colors-background-canvas);
 }
 
 .empty-card {
@@ -463,4 +457,32 @@
 .ds-button.w-full {
   display: flex;
   width: 100%;
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .balance-card {
+    padding: var(--ds-spacing-6) !important;
+  }
+
+  .main-balance {
+    font-size: var(--ds-typography-fontSize-48);
+  }
+
+  .balance-summary {
+    flex-direction: column;
+    gap: var(--ds-spacing-4);
+  }
+
+  .transaction-item-card {
+    flex-wrap: wrap;
+  }
+
+  .transaction-amount-block {
+    width: 100%;
+    text-align: left;
+  }
 }
