@@ -1,7 +1,7 @@
 # Project State – Financial Center
 
 > Última atualização: 2026-04-21
-> Branch: master
+> Branch: feature/frontend-fixes
 
 ## Overview
 
@@ -32,11 +32,14 @@ As of this session, the project has a fully functional CI/CD pipeline (GitHub Ac
 
 ### "New Expense" Workflow
 - **What was done**: Pixel-perfect `TransactionForm` integrated into the global Sidebar/Header layout. Features dynamic split calculations (BRL), responsive grid for amount/date, and a premium Pill/Tab toggle for transaction types.
+- **New Feature**: Added a scrollable category selection grid for better UX when dealing with many categories.
 - **Main files**: `apps/frontend/src/features/transactions/TransactionForm.tsx`, `apps/frontend/src/features/transactions/TransactionForm.css`.
 
 ### Design System & Global Layout
 - **What was done**: Atomic components (Button, Card, Input) and design tokens (colors, typography) in a shared design-system folder. High-fidelity redesign of `HomePage` and `PersonalPage` with Vanilla CSS.
-- **Main files**: `apps/frontend/src/design-system/`, `apps/frontend/src/features/dashboard/HomePage.tsx`, `apps/frontend/src/features/personal/PersonalPage.tsx`.
+- **Refactor**: Centralized page structure into a `DashboardLayout` component, decoupling `Header` and `Sidebar` for better maintenance.
+- **Fixed**: Corrected TypeScript errors in `DashboardLayout` by adding the missing `activePath` prop and updating the `Sidebar` to use it for menu highlighting.
+- **Main files**: `apps/frontend/src/design-system/`, `apps/frontend/src/layout/DashboardLayout.tsx`, `apps/frontend/src/layout/Sidebar.tsx`, `apps/frontend/src/features/dashboard/HomePage.tsx`, `apps/frontend/src/features/personal/PersonalPage.tsx`.
 ### Dependency Remediation & Vulnerability Fixes (Stages 1-4)
 - **What was done**: Resolved all advisory-backed findings (`hono`, `@hono/node-server`) via `pnpm.overrides`. Performed non-breaking patch and minor upgrades across root, backend, and frontend. Aligned `@types/node` versions between workspaces.
 - **Main files**: `package.json` (root), `apps/backend/package.json`, `apps/frontend/package.json`, `pnpm-lock.yaml`.

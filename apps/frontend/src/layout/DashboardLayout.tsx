@@ -6,7 +6,7 @@ import './DashboardLayout.css';
 type Props = {
   user?: SafeUser;
   onLogout?: () => void;
-  activePath: string;
+  activePath?: string;
   children: React.ReactNode;
 };
 

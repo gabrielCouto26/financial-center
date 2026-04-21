@@ -9,11 +9,16 @@ import {
 } from '../design-system/Icons';
 import './Sidebar.css';
 
-export function Sidebar() {
+type Props = {
+  activePath?: string;
+};
+
+export function Sidebar({ activePath }: Props) {
   const location = useLocation();
+  const currentPath = activePath || location.pathname;
 
   const getNavItemClass = (path: string) => {
-    return `nav-item ${location.pathname === path ? 'nav-item--active' : ''}`;
+    return `nav-item ${currentPath === path ? 'nav-item--active' : ''}`;
   };
 
   return (
