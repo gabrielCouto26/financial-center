@@ -15,8 +15,7 @@
     "lint:fix": "pnpm run lint:backend && pnpm run lint:frontend",
     "typecheck:frontend": "pnpm --filter frontend typecheck",
     "test:all": "pnpm --filter backend test && pnpm --filter frontend typecheck",
-    "test:backend": "pnpm --filter backend test",
-    "clean:cache": "npx tsx scripts/cleanGeminiCache.ts"
+    "test:backend": "pnpm --filter backend test"
   },
   "lint-staged": {
     "apps/backend/src/**/*.ts": [
