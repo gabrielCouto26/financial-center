@@ -1,0 +1,298 @@
+.transactions-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  padding-bottom: 80px;
+}
+
+.transactions-page__header {
+  margin-bottom: var(--space-2xl);
+}
+
+.transactions-page__header h1 {
+  margin: 0 0 var(--space-sm) 0;
+  font-size: var(--font-size-heading-lg);
+  color: var(--color-text-primary);
+}
+
+.transactions-page__header p {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+/* Filters */
+.transactions-page__filters {
+  margin-bottom: var(--space-lg);
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.filter-label {
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.filter-select {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.filter-select:hover {
+  border-color: var(--color-primary);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(107, 95, 255, 0.1);
+}
+
+.transactions-page__view-mode {
+  display: flex;
+  gap: var(--space-sm);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-lg);
+}
+
+.view-mode-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.view-mode-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.view-mode-btn--active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+.view-mode-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Statistics */
+.transactions-page__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.stat-item {
+  background: linear-gradient(135deg, rgba(107, 95, 255, 0.1), rgba(0, 212, 255, 0.05));
+  border: 1px solid rgba(107, 95, 255, 0.2);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  text-align: center;
+}
+
+.stat-item--income {
+  border-color: rgba(0, 208, 132, 0.2);
+  background: linear-gradient(135deg, rgba(0, 208, 132, 0.1), rgba(0, 212, 255, 0.05));
+}
+
+.stat-item--expense {
+  border-color: rgba(255, 107, 107, 0.2);
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 107, 107, 0.05));
+}
+
+.stat-item--total {
+  grid-column: auto;
+}
+
+.stat-label {
+  margin: 0;
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.stat-value {
+  margin: var(--space-sm) 0 0 0;
+  font-size: var(--font-size-heading-sm);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.stat-value--positive {
+  color: var(--color-success);
+}
+
+.stat-value--negative {
+  color: var(--color-danger);
+}
+
+/* List View */
+.transactions-page__list {
+  max-height: 800px;
+  overflow-y: auto;
+}
+
+.transactions-page__date-header {
+  position: sticky;
+  top: 0;
+  margin: var(--space-lg) 0 var(--space-md) 0;
+  padding: var(--space-md);
+  background-color: var(--color-surface);
+  font-size: var(--font-size-body-md);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+  z-index: 10;
+}
+
+.transactions-page__date-header:first-child {
+  margin-top: 0;
+}
+
+/* Timeline View */
+.transactions-page__timeline {
+  max-height: 800px;
+  overflow-y: auto;
+}
+
+.timeline {
+  position: relative;
+}
+
+.timeline__group {
+  margin-bottom: var(--space-2xl);
+}
+
+.timeline__date {
+  margin-bottom: var(--space-lg);
+}
+
+.timeline__items {
+  position: relative;
+  padding-left: var(--space-lg);
+}
+
+.timeline__items::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--color-primary), transparent);
+}
+
+.timeline__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-md);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  position: relative;
+}
+
+.timeline__item:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.timeline__dot {
+  position: absolute;
+  left: -29px;
+  width: 16px;
+  height: 16px;
+  background-color: var(--color-primary);
+  border: 3px solid var(--color-surface);
+  border-radius: 50%;
+  z-index: 5;
+}
+
+.timeline__content {
+  flex: 1;
+}
+
+.timeline__name {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body-md);
+}
+
+.timeline__category {
+  margin: var(--space-xs) 0 0 0;
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-tertiary);
+}
+
+.timeline__value {
+  font-weight: 700;
+  font-size: var(--font-size-body-md);
+  white-space: nowrap;
+}
+
+.timeline__value--income {
+  color: var(--color-success);
+}
+
+.timeline__value--expense {
+  color: var(--color-danger);
+}
+
+/* FAB */
+.transactions-page__fab {
+  position: fixed;
+  bottom: var(--space-lg);
+  right: var(--space-lg);
+  z-index: 50;
+}
+
+@media (max-width: 768px) {
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .transactions-page__stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .transactions-page__fab {
+    bottom: var(--space-md);
+    right: var(--space-md);
+    left: var(--space-md);
+  }
+
+  .transactions-page__fab button {
+    width: 100%;
+  }
+}

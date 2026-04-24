@@ -1,0 +1,56 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-body-sm);
+  font-weight: 600;
+  background-color: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.pill:hover {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-primary);
+}
+
+/* Variants */
+.pill--primary {
+  background-color: transparent;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.pill--primary:hover {
+  background-color: rgba(107, 95, 255, 0.1);
+}
+
+.pill--primary.pill--active {
+  background-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+.pill--secondary {
+  background-color: transparent;
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
+}
+
+.pill--secondary:hover {
+  background-color: rgba(0, 212, 255, 0.1);
+}
+
+.pill--secondary.pill--active {
+  background-color: var(--color-secondary);
+  color: var(--color-background);
+}
+
+.pill--default.pill--active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
