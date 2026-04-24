@@ -26,12 +26,12 @@
 }
 
 .pill--primary:hover {
-  background-color: rgba(107, 95, 255, 0.1);
+  background-color: rgba(74, 144, 226, 0.1);
 }
 
 .pill--primary.pill--active {
   background-color: var(--color-primary);
-  color: var(--color-text-primary);
+  color: #FFFFFF;
 }
 
 .pill--secondary {
@@ -41,7 +41,7 @@
 }
 
 .pill--secondary:hover {
-  background-color: rgba(0, 212, 255, 0.1);
+  background-color: rgba(92, 168, 217, 0.1);
 }
 
 .pill--secondary.pill--active {

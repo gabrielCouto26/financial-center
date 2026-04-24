@@ -63,7 +63,7 @@
 .filter-select:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(107, 95, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
 }
 
 .transactions-page__view-mode {
@@ -112,21 +112,21 @@
 }
 
 .stat-item {
-  background: linear-gradient(135deg, rgba(107, 95, 255, 0.1), rgba(0, 212, 255, 0.05));
-  border: 1px solid rgba(107, 95, 255, 0.2);
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.08), rgba(92, 168, 217, 0.06));
+  border: 1px solid rgba(74, 144, 226, 0.12);
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
   text-align: center;
 }
 
 .stat-item--income {
-  border-color: rgba(0, 208, 132, 0.2);
-  background: linear-gradient(135deg, rgba(0, 208, 132, 0.1), rgba(0, 212, 255, 0.05));
+  border-color: rgba(76, 175, 80, 0.12);
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.08), rgba(129, 199, 132, 0.06));
 }
 
 .stat-item--expense {
-  border-color: rgba(255, 107, 107, 0.2);
-  background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 107, 107, 0.05));
+  border-color: rgba(229, 115, 115, 0.12);
+  background: linear-gradient(135deg, rgba(229, 115, 115, 0.08), rgba(239, 154, 154, 0.06));
 }
 
 .stat-item--total {

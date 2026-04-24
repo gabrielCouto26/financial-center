@@ -20,28 +20,28 @@
 
 /* Variants */
 .badge--primary {
-  background-color: rgba(107, 95, 255, 0.15);
-  color: #8A7FFF;
+  background-color: rgba(74, 144, 226, 0.12);
+  color: #2E5C8A;
 }
 
 .badge--success {
-  background-color: rgba(0, 208, 132, 0.15);
-  color: #33D99F;
+  background-color: rgba(76, 175, 80, 0.12);
+  color: #388E3C;
 }
 
 .badge--danger {
-  background-color: rgba(255, 107, 107, 0.15);
-  color: #FF8E8E;
+  background-color: rgba(229, 115, 115, 0.12);
+  color: #C62828;
 }
 
 .badge--warning {
-  background-color: rgba(255, 184, 77, 0.15);
-  color: #FFC966;
+  background-color: rgba(255, 167, 38, 0.12);
+  color: #E65100;
 }
 
 .badge--secondary {
-  background-color: rgba(0, 212, 255, 0.15);
-  color: #33DFFF;
+  background-color: rgba(92, 168, 217, 0.12);
+  color: #3E7BA5;
 }
 
 .badge--default {

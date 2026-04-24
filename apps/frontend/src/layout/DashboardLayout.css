@@ -18,8 +18,8 @@
   overflow-y: auto;
   background-color: var(--color-background);
   background-image: 
-    radial-gradient(circle at 20% 50%, rgba(107, 95, 255, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(0, 212, 255, 0.05) 0%, transparent 50%);
+    radial-gradient(circle at 20% 50%, rgba(74, 144, 226, 0.04) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(92, 168, 217, 0.04) 0%, transparent 50%);
 }
 
 .dashboard-layout__main > * {

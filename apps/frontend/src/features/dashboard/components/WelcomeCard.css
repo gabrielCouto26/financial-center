@@ -1,7 +1,7 @@
 .welcome-card {
   position: relative;
-  background: linear-gradient(135deg, rgba(107, 95, 255, 0.2) 0%, rgba(0, 212, 255, 0.1) 100%);
-  border: 1px solid rgba(107, 95, 255, 0.2);
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.08) 0%, rgba(92, 168, 217, 0.08) 100%);
+  border: 1px solid rgba(74, 144, 226, 0.12);
   border-radius: var(--radius-lg);
   padding: var(--space-2xl);
   margin-bottom: var(--space-2xl);
@@ -12,8 +12,8 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 30% 30%, rgba(107, 95, 255, 0.3) 0%, transparent 50%),
-              radial-gradient(circle at 70% 70%, rgba(0, 212, 255, 0.2) 0%, transparent 50%);
+  background: radial-gradient(circle at 30% 30%, rgba(74, 144, 226, 0.06) 0%, transparent 50%),
+              radial-gradient(circle at 70% 70%, rgba(92, 168, 217, 0.06) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -51,7 +51,7 @@
   bottom: -50px;
   width: 200px;
   height: 200px;
-  background: radial-gradient(circle, rgba(107, 95, 255, 0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(74, 144, 226, 0.08) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
 }

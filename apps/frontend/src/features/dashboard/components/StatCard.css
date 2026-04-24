@@ -22,22 +22,22 @@
 }
 
 .stat-card--primary .stat-card__icon {
-  background-color: rgba(107, 95, 255, 0.15);
+  background-color: rgba(74, 144, 226, 0.12);
   color: var(--color-primary);
 }
 
 .stat-card--secondary .stat-card__icon {
-  background-color: rgba(0, 212, 255, 0.15);
+  background-color: rgba(92, 168, 217, 0.12);
   color: var(--color-secondary);
 }
 
 .stat-card--success .stat-card__icon {
-  background-color: rgba(0, 208, 132, 0.15);
+  background-color: rgba(76, 175, 80, 0.12);
   color: var(--color-success);
 }
 
 .stat-card--danger .stat-card__icon {
-  background-color: rgba(255, 107, 107, 0.15);
+  background-color: rgba(229, 115, 115, 0.12);
   color: var(--color-danger);
 }
 

@@ -5,7 +5,6 @@
   top: 0;
   z-index: 100;
   backdrop-filter: blur(8px);
-  background-color: rgba(37, 37, 74, 0.95);
 }
 
 .header__container {
@@ -123,7 +122,7 @@
 }
 
 .header__dropdown-item--danger:hover {
-  background-color: rgba(255, 107, 107, 0.1);
+  background-color: rgba(229, 115, 115, 0.15);
 }
 
 .header__dropdown-divider {
