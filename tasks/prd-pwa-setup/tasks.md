@@ -2,7 +2,7 @@
 
 ## Tarefas
 
-- [ ] 1.0 Extração de Módulo Compartilhado (`packages/shared`)
+- [x] 1.0 Extração de Módulo Compartilhado (`packages/shared`)
 - [ ] 2.0 Criação e Configuração Inicial do PWA (`apps/pwa`)
 - [ ] 3.0 Implementação da Camada de Persistência e Integração API
 - [ ] 4.0 Configuração Base de Layout e Estilização (TailwindCSS)
